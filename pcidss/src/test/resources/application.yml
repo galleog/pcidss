@@ -1,0 +1,6 @@
+iso8583:
+  flavor: bpc
+
+  message:
+    configs:
+      - classpath:j8583.json
