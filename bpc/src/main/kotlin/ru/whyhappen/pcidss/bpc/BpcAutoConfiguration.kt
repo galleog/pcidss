@@ -21,12 +21,13 @@ class BpcAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     fun connectorConfigurer(messageFactory: MessageFactory<IsoMessage>): ConnectorConfigurer<IsoMessage> {
+        // I'm not sure it's needed because as far as I understand only clients should send logon messages
         return ConnectorConfigurer({
             messageFactory.newMessage(
                 MessageClass.NETWORK_MANAGEMENT,
                 MessageFunction.REQUEST
             ).apply {
-                updateValue(24, 831)
+                updateValue(24, 801)
             }
         })
     }

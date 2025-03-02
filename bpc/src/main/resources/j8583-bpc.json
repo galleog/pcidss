@@ -1,0 +1,24 @@
+{
+  "templates": [
+    {
+      "type": "1804",
+      "fields": [
+        {
+          "num": 7,
+          "type": "DATE10"
+        },
+        {
+          "num": 11,
+          "type": "NUMERIC",
+          "length": 6
+        },
+        {
+          "num": 24,
+          "type": "NUMERIC",
+          "length": 3,
+          "value": "831"
+        }
+      ]
+    }
+  ]
+}
