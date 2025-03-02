@@ -3,4 +3,4 @@ iso8583:
 
   message:
     configs:
-      - classpath:j8583.json
+      - classpath:j8583-iso.json

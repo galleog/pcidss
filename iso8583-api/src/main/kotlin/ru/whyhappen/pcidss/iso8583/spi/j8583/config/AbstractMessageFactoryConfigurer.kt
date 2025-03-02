@@ -8,11 +8,7 @@ import ru.whyhappen.pcidss.iso8583.spi.j8583.config.model.Iso8583Config
  * Abstract base implementation of [MessageFactoryConfigurer].
  */
 abstract class AbstractMessageFactoryConfigurer<T : IsoMessage> : MessageFactoryConfigurer<T> {
-    override fun createMessageFactory(): MessageFactory<T> {
-        val messageFactory = MessageFactory<T>()
-        configure(messageFactory)
-        return messageFactory
-    }
+    override fun createMessageFactory(): MessageFactory<T> = MessageFactory<T>().also { configure(it) }
 
     /**
      * Applies [Iso8583Config]s to a message factory.

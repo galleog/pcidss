@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation(platform(libs.spring.boot.bom))
 
+    implementation(project(":iso"))
     implementation(project(":bpc"))
     implementation(project(":way4"))
     implementation("org.springframework.boot:spring-boot-starter")

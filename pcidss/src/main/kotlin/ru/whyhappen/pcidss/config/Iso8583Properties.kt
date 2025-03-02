@@ -129,5 +129,5 @@ data class Iso9583MessageProperties(
     /**
      * Resources to configure the message factory. They are applied consecutively.
      */
-    var configs: List<Resource> = listOf(ClassPathResource("j8583.json"))
+    var configs: List<Resource> = emptyList()
 )
