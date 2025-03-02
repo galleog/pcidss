@@ -3,7 +3,6 @@ package ru.whyhappen.pcidss.config
 import com.github.kpavlov.jreactive8583.iso.ISO8583Version
 import com.github.kpavlov.jreactive8583.iso.MessageOrigin
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.Resource
 import java.nio.charset.StandardCharsets
 
