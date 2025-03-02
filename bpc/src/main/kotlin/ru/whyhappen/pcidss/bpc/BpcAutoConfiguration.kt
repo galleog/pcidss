@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.whyhappen.pcidss.iso8583.spi.netty.ConnectorConfigurer
+import ru.whyhappen.pcidss.iso8583.spi.netty.ServerConnectorConfigurer
 
 /**
  * Autoconfiguration for BPC's flavor of ISO8583.
@@ -20,9 +20,9 @@ import ru.whyhappen.pcidss.iso8583.spi.netty.ConnectorConfigurer
 class BpcAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
-    fun connectorConfigurer(messageFactory: MessageFactory<IsoMessage>): ConnectorConfigurer<IsoMessage> {
+    fun connectorConfigurer(messageFactory: MessageFactory<IsoMessage>): ServerConnectorConfigurer<IsoMessage> {
         // I'm not sure it's needed because as far as I understand only clients should send logon messages
-        return ConnectorConfigurer({
+        return ServerConnectorConfigurer({
             messageFactory.newMessage(
                 MessageClass.NETWORK_MANAGEMENT,
                 MessageFunction.REQUEST

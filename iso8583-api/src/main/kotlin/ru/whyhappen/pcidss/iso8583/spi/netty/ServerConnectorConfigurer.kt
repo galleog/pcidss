@@ -14,7 +14,7 @@ const val CONNECT_EVENT_HANDLER_NAME = "connectEventHandler"
 /**
  * Configurer that sends an ISO message when a client connects to the server.
  */
-class ConnectorConfigurer<T : IsoMessage>(
+class ServerConnectorConfigurer<T : IsoMessage>(
     private val messageCreator: () -> T
 ) : JReactive8583ConnectorConfigurer<ServerConfiguration, ServerBootstrap> {
     override fun configurePipeline(pipeline: ChannelPipeline, configuration: ServerConfiguration) {
