@@ -142,11 +142,11 @@ data class KeystoreProperties(
     /**
      * Path to the keystore.
      */
-    var keystorePath: String = "keystore.bcfks",
+    var path: String = "keystore.bcfks",
     /**
      * Keystore password.
      */
-    var keystorePassword: String = "secret",
+    var password: String = "secret",
     /**
      * Password for the secret key.
      */

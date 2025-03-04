@@ -79,5 +79,5 @@ class Iso8583Configuration {
 
     @Bean
     fun keyManager(properties: Iso8583Properties) =
-        KeyManager(properties.keystore.keystorePath, properties.keystore.keystorePassword)
+        KeyManager(properties.keystore.path, properties.keystore.password)
 }
