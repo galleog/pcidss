@@ -2,12 +2,14 @@
 kotlin = "2.1.10"
 spring-boot = "3.4.2"
 jreactive8583 = "1.5.1"
+bc-fips = "2.1.0"
 
 [libraries]
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-allopen-plugin = { group = "org.jetbrains.kotlin.plugin.allopen", name = "org.jetbrains.kotlin.plugin.allopen.gradle.plugin", version.ref = "kotlin" }
 spring-boot-bom = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "spring-boot" }
 jreactive8583 = { group = "com.github.kpavlov.jreactive8583", name = "netty-iso8583", version.ref = "jreactive8583" }
+bc-fips = { group = "org.bouncycastle", name = "bc-fips", version.ref = "bc-fips" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }

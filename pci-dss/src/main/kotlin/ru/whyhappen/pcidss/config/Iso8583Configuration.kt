@@ -13,9 +13,10 @@ import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.whyhappen.pcidss.iso8583.spi.server.Iso8583ServerBootstrap
 import ru.whyhappen.pcidss.iso8583.spi.j8583.CurrentTimeTraceNumberGenerator
 import ru.whyhappen.pcidss.iso8583.spi.j8583.config.JsonResourceMessageFactoryConfigurer
+import ru.whyhappen.pcidss.iso8583.spi.server.Iso8583ServerBootstrap
+import ru.whyhappen.pcidss.token.KeyManager
 
 /**
  * Autoconfiguration for [Iso8583Server].
@@ -75,4 +76,8 @@ class Iso8583Configuration {
 
     @Bean
     fun traceNumberGenerator(): TraceNumberGenerator = CurrentTimeTraceNumberGenerator()
+
+    @Bean
+    fun keyManager(properties: Iso8583Properties) =
+        KeyManager(properties.keystore.keystorePath, properties.keystore.keystorePassword)
 }

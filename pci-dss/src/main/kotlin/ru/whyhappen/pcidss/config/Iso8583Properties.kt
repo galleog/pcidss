@@ -18,7 +18,11 @@ data class Iso8583Properties(
     /**
      * Properties for ISO8583 messages.
      */
-    var message: Iso9583MessageProperties = Iso9583MessageProperties()
+    var message: Iso9583MessageProperties = Iso9583MessageProperties(),
+    /**
+     * Keystore properties.
+     */
+    var keystore: KeystoreProperties = KeystoreProperties()
 )
 
 /**
@@ -129,4 +133,30 @@ data class Iso9583MessageProperties(
      * Resources to configure the message factory. They are applied consecutively.
      */
     var configs: List<Resource> = emptyList()
+)
+
+/**
+ * Properties for the keystore that keeps the secret key to hash ISO8583 secret fields.
+ */
+data class KeystoreProperties(
+    /**
+     * Path to the keystore.
+     */
+    var keystorePath: String = "keystore.bcfks",
+    /**
+     * Keystore password.
+     */
+    var keystorePassword: String = "secret",
+    /**
+     * Password for the secret key.
+     */
+    var keyPassword: String = "secret",
+    /**
+     * Alias for the current secret key.
+     */
+    var currentKeyAlias: String = "current",
+    /**
+     * Alias for the previous secret key.
+     */
+    var previousKeyAlias: String = "previous",
 )
