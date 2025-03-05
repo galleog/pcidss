@@ -26,7 +26,7 @@ class KeyManager (
      */
     private val keystorePassword: String
 ) {
-    private val path: Path = Path.of(keystorePath)
+    val path: Path = Path.of(keystorePath)
 
     /**
      * Verifies if the keystore exists.
