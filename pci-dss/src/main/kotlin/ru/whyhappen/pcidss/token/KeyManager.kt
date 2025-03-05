@@ -103,7 +103,7 @@ class KeyManager (
         }
     }
 
-    private fun generateKey(): SecretKey = with(KeyGenerator.getInstance("AES", "BCFIPS")) {
+    private fun generateKey(): SecretKey = with(KeyGenerator.getInstance("HmacSHA256", "BCFIPS")) {
         init(256, secureRandom)
         generateKey()
     }
