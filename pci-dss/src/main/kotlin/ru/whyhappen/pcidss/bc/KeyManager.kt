@@ -1,8 +1,7 @@
-package ru.whyhappen.pcidss.token
+package ru.whyhappen.pcidss.bc
 
-import org.bouncycastle.crypto.EntropySourceProvider
-import org.bouncycastle.crypto.fips.FipsDRBG
-import org.bouncycastle.crypto.util.BasicEntropySourceProvider
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
@@ -16,7 +15,7 @@ import javax.crypto.SecretKey
  * Manager for the keystore and secret key the application uses to hash ISO8583 secret fields.
  * Uses Bouncy Castle FIPS keystore to save keys.
  */
-class KeyManager (
+class KeyManager(
     /**
      * Path to the keystore to save secret keys.
      */
@@ -32,7 +31,7 @@ class KeyManager (
      * Verifies if the keystore exists.
      */
     val keystoreExists: Boolean
-        get() = Files.isRegularFile(path)
+        get() = Files.exists(path)
 
     /**
      * Gets the secret key from the keystore.
@@ -85,12 +84,16 @@ class KeyManager (
 
             // store the previous key under the previous key alias
             val previousKey = keystore.getKey(currentKeyAlias, keyPassArray)
-            keystore.setKeyEntry(currentKeyAlias, generateKey(), keyPassArray, null)
+            keystore.setKeyEntry(currentKeyAlias, generateHmacKey(), keyPassArray, null)
             keystore.setKeyEntry(previousKeyAlias, previousKey, keyPassArray, null)
+
+            logger.info("Secret key has been updated in keystore $path")
         } else {
             keystore.load(null, null)
 
-            keystore.setKeyEntry(currentKeyAlias, generateKey(), keyPassArray, null)
+            keystore.setKeyEntry(currentKeyAlias, generateHmacKey(), keyPassArray, null)
+
+            logger.info("New keystore $path has been created")
         }
 
         Files.newOutputStream(
@@ -103,24 +106,13 @@ class KeyManager (
         }
     }
 
-    private fun generateKey(): SecretKey = with(KeyGenerator.getInstance("HmacSHA256", "BCFIPS")) {
-        init(256, secureRandom)
-        generateKey()
-    }
-
     companion object {
-        private val nonce = ByteArray(32)
+        private val logger: Logger = LoggerFactory.getLogger(KeyManager::class.java)
 
-        val secureRandom: SecureRandom by lazy {
-            val entSource: EntropySourceProvider = BasicEntropySourceProvider(SecureRandom(), true)
-            val drbgBuilder = FipsDRBG.SHA512_HMAC.fromEntropySource(entSource)
-                .setSecurityStrength(256)
-                .setEntropyBitsRequired(256)
-            drbgBuilder.build(nonce, false)
-        }
-
-        init {
-            SecureRandom().nextBytes(nonce)
-        }
+        private fun generateHmacKey(): SecretKey =
+            KeyGenerator.getInstance("HmacSHA256", "BCFIPS").run {
+                init(256, RandomHolder.secureRandom)
+                generateKey()
+            }
     }
 }

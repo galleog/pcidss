@@ -18,11 +18,7 @@ data class Iso8583Properties(
     /**
      * Properties for ISO8583 messages.
      */
-    var message: Iso9583MessageProperties = Iso9583MessageProperties(),
-    /**
-     * Keystore properties.
-     */
-    var keystore: KeystoreProperties = KeystoreProperties()
+    var message: Iso9583MessageProperties = Iso9583MessageProperties()
 )
 
 /**
@@ -57,15 +53,6 @@ data class ConnectionProperties(
      * Indicates if sensitive data specified in [sensitiveDataFields] should be masked in the log.
      */
     var logSensitiveData: Boolean = false,
-    /**
-     * List of ISO8583 sensitive field numbers to be masked.
-     */
-    var sensitiveDataFields: List<Int> = listOf(
-        34, // PAN extended
-        35, // track 2
-        36, // track 3
-        45, // track 1
-    ),
     /**
      * Indicates if field names should be logged.
      */
@@ -132,31 +119,15 @@ data class Iso9583MessageProperties(
     /**
      * Resources to configure the message factory. They are applied consecutively.
      */
-    var configs: List<Resource> = emptyList()
-)
-
-/**
- * Properties for the keystore that keeps the secret key to hash ISO8583 secret fields.
- */
-data class KeystoreProperties(
+    var configs: List<Resource> = emptyList(),
     /**
-     * Path to the keystore.
+     * List of ISO8583 sensitive field numbers to be masked and encoded.
      */
-    var path: String = "keystore.bcfks",
-    /**
-     * Keystore password.
-     */
-    var password: String = "secret",
-    /**
-     * Password for the secret key.
-     */
-    var keyPassword: String = "secret",
-    /**
-     * Alias for the current secret key.
-     */
-    var currentKeyAlias: String = "current",
-    /**
-     * Alias for the previous secret key.
-     */
-    var previousKeyAlias: String = "previous",
+    var sensitiveDataFields: List<Int> = listOf(
+        2,  // PAN
+        34, // PAN extended
+        35, // track 2
+        36, // track 3
+        45, // track 1
+    ),
 )

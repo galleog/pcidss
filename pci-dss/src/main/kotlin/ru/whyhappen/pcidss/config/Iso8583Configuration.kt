@@ -13,16 +13,16 @@ import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import ru.whyhappen.pcidss.bc.KeyManager
 import ru.whyhappen.pcidss.iso8583.spi.j8583.CurrentTimeTraceNumberGenerator
 import ru.whyhappen.pcidss.iso8583.spi.j8583.config.JsonResourceMessageFactoryConfigurer
 import ru.whyhappen.pcidss.iso8583.spi.server.Iso8583ServerBootstrap
-import ru.whyhappen.pcidss.token.KeyManager
 
 /**
- * Autoconfiguration for [Iso8583Server].
+ * Configuration for [Iso8583Server].
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties(value = [Iso8583Properties::class])
+@EnableConfigurationProperties(Iso8583Properties::class)
 class Iso8583Configuration {
     @Bean
     fun iso8583Server(
@@ -36,7 +36,7 @@ class Iso8583Configuration {
             .replyOnError(properties.connection.replyOnError)
             .addLoggingHandler(properties.connection.addLoggingHandler)
             .logSensitiveData(properties.connection.logSensitiveData)
-            .sensitiveDataFields(*properties.connection.sensitiveDataFields.toIntArray())
+            .sensitiveDataFields(*properties.message.sensitiveDataFields.toIntArray())
             .describeFieldsInLog(properties.connection.logFieldDescription)
             .build()
         val server = Iso8583Server(properties.connection.port, configuration, messageFactory)
@@ -76,8 +76,4 @@ class Iso8583Configuration {
 
     @Bean
     fun traceNumberGenerator(): TraceNumberGenerator = CurrentTimeTraceNumberGenerator()
-
-    @Bean
-    fun keyManager(properties: Iso8583Properties) =
-        KeyManager(properties.keystore.path, properties.keystore.password)
 }

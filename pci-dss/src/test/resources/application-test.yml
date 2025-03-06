@@ -4,6 +4,3 @@ iso8583:
   message:
     configs:
       - classpath:j8583-iso.json
-
-  keystore:
-    path: build/keystore.bcfks
