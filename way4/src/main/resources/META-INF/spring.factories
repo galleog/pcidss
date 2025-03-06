@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=ru.whyhappen.pcidss.way4.Way4AutoConfiguration

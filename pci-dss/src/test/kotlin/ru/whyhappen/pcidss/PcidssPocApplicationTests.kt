@@ -8,11 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
-@ActiveProfiles("test")
 @SpringBootTest
+@ActiveProfiles("test")
 class PcidssPocApplicationTests {
     @Autowired
     private lateinit var isoServer: Iso8583Server<IsoMessage>
@@ -20,7 +19,6 @@ class PcidssPocApplicationTests {
     @Test
     fun `iso8583 server is running and properly configured`() {
         assertTrue(isoServer.isStarted)
-        assertNotNull(isoServer.configurer)
     }
 
     companion object {

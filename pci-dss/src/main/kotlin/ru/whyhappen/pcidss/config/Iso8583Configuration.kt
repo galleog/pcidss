@@ -2,6 +2,7 @@ package ru.whyhappen.pcidss.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.kpavlov.jreactive8583.ConnectorConfigurer
+import com.github.kpavlov.jreactive8583.IsoMessageListener
 import com.github.kpavlov.jreactive8583.iso.J8583MessageFactory
 import com.github.kpavlov.jreactive8583.iso.MessageFactory
 import com.github.kpavlov.jreactive8583.server.Iso8583Server
@@ -26,6 +27,7 @@ class Iso8583Configuration {
     @Bean
     fun iso8583Server(
         properties: Iso8583Properties,
+        messageListeners: List<IsoMessageListener<IsoMessage>>,
         configurer: ObjectProvider<ConnectorConfigurer<ServerConfiguration, ServerBootstrap>>,
         messageFactory: MessageFactory<IsoMessage>
     ): Iso8583Server<IsoMessage> {
@@ -38,9 +40,12 @@ class Iso8583Configuration {
             .sensitiveDataFields(*properties.message.sensitiveDataFields.toIntArray())
             .describeFieldsInLog(properties.connection.logFieldDescription)
             .build()
-        val server = Iso8583Server(properties.connection.port, configuration, messageFactory)
-        server.configurer = configurer.ifAvailable
-        return server
+        return Iso8583Server(properties.connection.port, configuration, messageFactory).apply {
+            this.configurer = configurer.ifAvailable
+            for (messageListener in messageListeners) {
+                addMessageListener(messageListener)
+            }
+        }
     }
 
     @Bean
@@ -49,24 +54,24 @@ class Iso8583Configuration {
         objectMapper: ObjectMapper,
         traceNumberGenerator: TraceNumberGenerator
     ): MessageFactory<IsoMessage> {
-        val messageFactory =
-            JsonResourceMessageFactoryConfigurer<IsoMessage>(objectMapper, properties.message.configs)
+        val messageFactory = JsonResourceMessageFactoryConfigurer<IsoMessage>(objectMapper, properties.message.configs)
                 .createMessageFactory()
-
-        // set message factory properties
-        messageFactory.traceNumberGenerator = traceNumberGenerator
-        messageFactory.assignDate = properties.message.assignDate
-        messageFactory.isBinaryHeader = properties.message.binaryHeader
-        messageFactory.isBinaryFields = properties.message.binaryFields
-        messageFactory.etx = properties.message.etx
-        messageFactory.ignoreLastMissingField = properties.message.ignoreLastMissingField
-        messageFactory.isForceSecondaryBitmap = properties.message.forceSecondaryBitmap
-        messageFactory.isUseBinaryBitmap = properties.message.binaryBitmap
-        messageFactory.isForceStringEncoding = properties.message.forceStringEncoding
-        messageFactory.characterEncoding = properties.message.characterEncoding
-        messageFactory.isVariableLengthFieldsInHex = properties.message.variableLengthFieldsInHex
-        messageFactory.characterEncoding = properties.message.characterEncoding
-        messageFactory.isUseDateTimeApi = true
+                .apply {
+                    // set message factory properties
+                    this.traceNumberGenerator = traceNumberGenerator
+                    assignDate = properties.message.assignDate
+                    isBinaryHeader = properties.message.binaryHeader
+                    isBinaryFields = properties.message.binaryFields
+                    etx = properties.message.etx
+                    ignoreLastMissingField = properties.message.ignoreLastMissingField
+                    isForceSecondaryBitmap = properties.message.forceSecondaryBitmap
+                    isUseBinaryBitmap = properties.message.binaryBitmap
+                    isForceStringEncoding = properties.message.forceStringEncoding
+                    characterEncoding = properties.message.characterEncoding
+                    isVariableLengthFieldsInHex = properties.message.variableLengthFieldsInHex
+                    characterEncoding = properties.message.characterEncoding
+                    isUseDateTimeApi = true
+                }
         return J8583MessageFactory(messageFactory, properties.message.isoVersion, properties.message.role)
     }
 
