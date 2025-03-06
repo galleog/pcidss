@@ -13,7 +13,6 @@ import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.whyhappen.pcidss.bc.KeyManager
 import ru.whyhappen.pcidss.iso8583.spi.j8583.CurrentTimeTraceNumberGenerator
 import ru.whyhappen.pcidss.iso8583.spi.j8583.config.JsonResourceMessageFactoryConfigurer
 import ru.whyhappen.pcidss.iso8583.spi.server.Iso8583ServerBootstrap

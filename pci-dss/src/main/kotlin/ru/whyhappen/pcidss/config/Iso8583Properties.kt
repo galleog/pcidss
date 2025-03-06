@@ -50,7 +50,8 @@ data class ConnectionProperties(
      */
     var addLoggingHandler: Boolean = false,
     /**
-     * Indicates if sensitive data specified in [sensitiveDataFields] should be masked in the log.
+     * Indicates if sensitive data specified in [Iso9583MessageProperties.sensitiveDataFields]
+     * should be masked in the log.
      */
     var logSensitiveData: Boolean = false,
     /**
