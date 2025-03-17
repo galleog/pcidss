@@ -27,7 +27,7 @@ class Iso8583Configuration {
     @Bean
     fun iso8583Server(
         properties: Iso8583Properties,
-        messageListeners: List<IsoMessageListener<IsoMessage>>,
+        messageListeners: ObjectProvider<IsoMessageListener<IsoMessage>>,
         configurer: ObjectProvider<ConnectorConfigurer<ServerConfiguration, ServerBootstrap>>,
         messageFactory: MessageFactory<IsoMessage>
     ): Iso8583Server<IsoMessage> {
@@ -42,9 +42,8 @@ class Iso8583Configuration {
             .build()
         return Iso8583Server(properties.connection.port, configuration, messageFactory).apply {
             this.configurer = configurer.ifAvailable
-            for (messageListener in messageListeners) {
-                addMessageListener(messageListener)
-            }
+            messageListeners.orderedStream()
+                .forEach { addMessageListener(it) }
         }
     }
 
@@ -55,23 +54,23 @@ class Iso8583Configuration {
         traceNumberGenerator: TraceNumberGenerator
     ): MessageFactory<IsoMessage> {
         val messageFactory = JsonResourceMessageFactoryConfigurer<IsoMessage>(objectMapper, properties.message.configs)
-                .createMessageFactory()
-                .apply {
-                    // set message factory properties
-                    this.traceNumberGenerator = traceNumberGenerator
-                    assignDate = properties.message.assignDate
-                    isBinaryHeader = properties.message.binaryHeader
-                    isBinaryFields = properties.message.binaryFields
-                    etx = properties.message.etx
-                    ignoreLastMissingField = properties.message.ignoreLastMissingField
-                    isForceSecondaryBitmap = properties.message.forceSecondaryBitmap
-                    isUseBinaryBitmap = properties.message.binaryBitmap
-                    isForceStringEncoding = properties.message.forceStringEncoding
-                    characterEncoding = properties.message.characterEncoding
-                    isVariableLengthFieldsInHex = properties.message.variableLengthFieldsInHex
-                    characterEncoding = properties.message.characterEncoding
-                    isUseDateTimeApi = true
-                }
+            .createMessageFactory()
+            .apply {
+                // set message factory properties
+                this.traceNumberGenerator = traceNumberGenerator
+                assignDate = properties.message.assignDate
+                isBinaryHeader = properties.message.binaryHeader
+                isBinaryFields = properties.message.binaryFields
+                etx = properties.message.etx
+                ignoreLastMissingField = properties.message.ignoreLastMissingField
+                isForceSecondaryBitmap = properties.message.forceSecondaryBitmap
+                isUseBinaryBitmap = properties.message.binaryBitmap
+                isForceStringEncoding = properties.message.forceStringEncoding
+                characterEncoding = properties.message.characterEncoding
+                isVariableLengthFieldsInHex = properties.message.variableLengthFieldsInHex
+                characterEncoding = properties.message.characterEncoding
+                isUseDateTimeApi = true
+            }
         return J8583MessageFactory(messageFactory, properties.message.isoVersion, properties.message.role)
     }
 

@@ -12,7 +12,7 @@ import kotlin.test.assertTrue
 
 @SpringBootTest
 @ActiveProfiles("test")
-class PcidssPocApplicationTests {
+class PciDssApplicationTests {
     @Autowired
     private lateinit var isoServer: Iso8583Server<IsoMessage>
 
