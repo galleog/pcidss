@@ -12,5 +12,11 @@ import ru.whyhappen.pcidss.bc.KeyManager
 @EnableConfigurationProperties(KeystoreProperties::class)
 class KeystoreConfiguration {
     @Bean
-    fun keyManager(properties: KeystoreProperties) = KeyManager(properties.path, properties.password)
+    fun keyManager(properties: KeystoreProperties) = KeyManager(
+        properties.path,
+        properties.password,
+        properties.keyPassword,
+        properties.currentKeyAlias,
+        properties.previousKeyAlias
+    )
 }

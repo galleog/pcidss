@@ -9,6 +9,7 @@ import java.nio.file.StandardOpenOption
 import java.security.*
 import java.security.cert.CertificateException
 import javax.crypto.KeyGenerator
+import javax.crypto.Mac
 import javax.crypto.SecretKey
 
 /**
@@ -23,46 +24,33 @@ class KeyManager(
     /**
      * Keystore password.
      */
-    private val keystorePassword: String
+    private val keystorePassword: String,
+    /**
+     * Key password.
+     */
+    private val keyPassword: String,
+    /**
+     * Current key alias.
+     */
+    private val currentKeyAlias: String,
+    /**
+     * Previous key alias.
+     */
+    private val previousKeyAlias: String
 ) {
     val path: Path = Path.of(keystorePath)
+
+    private lateinit var currentKey: Key
+    private var previousKey: Key? = null
 
     /**
      * Verifies if the keystore exists.
      */
-    val keystoreExists: Boolean
+    private val keystoreExists: Boolean
         get() = Files.exists(path)
 
     /**
-     * Gets the secret key from the keystore.
-     *
-     * @param keyAlias the alias for the new secret key
-     * @param keyPassword the password to protect the key
-     */
-    @Throws(
-        IOException::class,
-        KeyStoreException::class,
-        CertificateException::class,
-        NoSuchAlgorithmException::class,
-        UnrecoverableKeyException::class
-    )
-    fun getSecretKey(keyAlias: String, keyPassword: String): Key {
-        require(keystoreExists) { "Keystore $path doesn't exist" }
-
-        val keystore = KeyStore.getInstance("BCFKS", "BCFIPS")
-        Files.newInputStream(path, StandardOpenOption.READ).use {
-            keystore.load(it, keystorePassword.toCharArray())
-        }
-
-        return keystore.getKey(keyAlias, keyPassword.toCharArray())
-    }
-
-    /**
-     * Changes the secret key used to hash ISO8583 secret fields and saves the previous key with another alias.
-     *
-     * @param currentKeyAlias the alias for the new secret key
-     * @param previousKeyAlias the alias to store the previous secret key
-     * @param keyPassword the password to protect the keys
+     * Reads keys from the keystore or creates it if it doesn't exist.
      */
     @Throws(
         IOException::class,
@@ -72,39 +60,91 @@ class KeyManager(
         NoSuchAlgorithmException::class,
         UnrecoverableKeyException::class
     )
-    fun updateSecretKey(currentKeyAlias: String, previousKeyAlias: String, keyPassword: String) {
+    fun init() {
         val keystore = KeyStore.getInstance("BCFKS", "BCFIPS")
         val keystorePassArray = keystorePassword.toCharArray()
         val keyPassArray = keyPassword.toCharArray()
 
         if (keystoreExists) {
+            // read keys from the keystore
             Files.newInputStream(path, StandardOpenOption.READ).use {
                 keystore.load(it, keystorePassArray)
             }
 
-            // store the previous key under the previous key alias
-            val previousKey = keystore.getKey(currentKeyAlias, keyPassArray)
-            keystore.setKeyEntry(currentKeyAlias, generateHmacKey(), keyPassArray, null)
-            keystore.setKeyEntry(previousKeyAlias, previousKey, keyPassArray, null)
+            currentKey = keystore.getKey(currentKeyAlias, keyPassArray)
+            previousKey = keystore.getKey(previousKeyAlias, keyPassArray)
 
-            logger.info("Secret key has been updated in keystore $path")
+            logger.info("Keystore $path has been read")
         } else {
+            // create a new keystore
             keystore.load(null, null)
 
-            keystore.setKeyEntry(currentKeyAlias, generateHmacKey(), keyPassArray, null)
+            currentKey = generateHmacKey()
+            keystore.setKeyEntry(currentKeyAlias, currentKey, keyPassArray, null)
 
             logger.info("New keystore $path has been created")
-        }
 
-        Files.newOutputStream(
-            path,
-            StandardOpenOption.WRITE,
-            StandardOpenOption.TRUNCATE_EXISTING,
-            StandardOpenOption.CREATE
-        ).use {
+            Files.newOutputStream(path, StandardOpenOption.WRITE,StandardOpenOption.CREATE_NEW).use {
+                keystore.store(it, keystorePassArray)
+            }
+        }
+    }
+
+    /**
+     * Changes the secret key used to hash ISO8583 secret fields and saves the previous key with another alias.
+     */
+    @Throws(
+        IOException::class,
+        KeyStoreException::class,
+        CertificateException::class,
+        NoSuchProviderException::class,
+        NoSuchAlgorithmException::class
+    )
+    fun updateSecretKey() {
+        require(keystoreExists) { "Keystore $path doesn't exist" }
+
+        val keystore = KeyStore.getInstance("BCFKS", "BCFIPS")
+        val keystorePassArray = keystorePassword.toCharArray()
+        val keyPassArray = keyPassword.toCharArray()
+
+        keystore.load(null, null)
+
+        // generate a new key and store the previous one under the previous key alias
+        previousKey = currentKey
+        currentKey = generateHmacKey()
+        keystore.setKeyEntry(currentKeyAlias, currentKey, keyPassArray, null)
+        keystore.setKeyEntry(previousKeyAlias, previousKey, keyPassArray, null)
+
+        logger.info("Secret key has been updated in keystore $path")
+
+        Files.newOutputStream(path, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING).use {
             keystore.store(it, keystorePassArray)
         }
     }
+
+    /**
+     * Calculates HMAC SHA256 using [Bouncy Castle FIPS](https://www.bouncycastle.org/download/bouncy-castle-java-fips/).
+     *
+     * @param data the [ByteArray] that should be hashed
+     */
+    @Throws(
+        NoSuchAlgorithmException::class,
+        NoSuchProviderException::class,
+        InvalidKeyException::class
+    )
+    private fun calculateCurrentHmac(data: ByteArray): ByteArray = calculateHmac(currentKey, data)
+
+    /**
+     * Calculates HMAC SHA256 using the previous key.
+     *
+     * @param data the [ByteArray] that should be hashed
+     */
+    @Throws(
+        NoSuchAlgorithmException::class,
+        NoSuchProviderException::class,
+        InvalidKeyException::class
+    )
+    fun calculatePreviousHmac(data: ByteArray): ByteArray? = previousKey?.run { calculateHmac(this, data) }
 
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(KeyManager::class.java)
@@ -113,6 +153,12 @@ class KeyManager(
             KeyGenerator.getInstance("HmacSHA256", "BCFIPS").run {
                 init(256, RandomHolder.secureRandom)
                 generateKey()
+            }
+
+        private fun calculateHmac(key: Key, data: ByteArray): ByteArray =
+            Mac.getInstance("HmacSHA256", "BCFIPS").run {
+                init(key)
+                doFinal(data)
             }
     }
 }
