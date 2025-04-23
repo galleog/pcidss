@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler
+package ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline
 
 import com.github.kpavlov.jreactive8583.iso.MessageClass
 import com.github.kpavlov.jreactive8583.iso.MessageFactory
@@ -10,11 +10,11 @@ import io.netty.handler.timeout.IdleState
 import io.netty.handler.timeout.IdleStateEvent
 
 /**
- * Sends heartbeats (administrative messages) when channel becomes idle, i.e. `IdleStateEvent` is received.
+ * Sends heartbeats (administrative messages) when the channel becomes idle, i.e. `IdleStateEvent` is received.
  *
  * @see com.github.kpavlov.jreactive8583.netty.pipeline.IdleEventHandler
  */
-open class IdleEventHandler(
+open class IdleEventChannelHandler(
     protected val isoMessageFactory: MessageFactory<IsoMessage>
 ) : ChannelInboundHandlerAdapter() {
     override fun userEventTriggered(ctx: ChannelHandlerContext, evt: Any) {

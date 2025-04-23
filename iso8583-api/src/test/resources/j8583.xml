@@ -25,6 +25,15 @@
         <field num="126" type="LLLVAR">...and yet another fixed field.</field>
     </template>
 
+    <template type="0280">
+        <field num="3" type="NUMERIC" length="2">99</field>
+    </template>
+
+    <!-- echo request -->
+    <template type="0800">
+        <field num="70" type="NUMERIC" length="3">301</field>
+    </template>
+
     <!-- The server uses this to read the requests -->
     <parse type="0200">
         <field num="3" type="NUMERIC" length="6"/>
@@ -73,5 +82,20 @@
         <field num="100" type="LLVAR"/>
         <field num="102" type="LLVAR"/>
         <field num="126" type="LLLVAR"/>
+    </parse>
+    
+    <!-- administrative request -->
+    <parse type="0644">
+        <field num="7" type="DATE10"/>
+        <field num="11" type="NUMERIC" length="6"/>
+        <field num="24" type="NUMERIC" length="3"/>
+        <field num="44" type="LLVAR"/>
+    </parse>
+
+    <!-- echo request -->
+    <parse type="0800">
+        <field num="7" type="DATE10"/>
+        <field num="11" type="NUMERIC" length="6"/>
+        <field num="70" type="NUMERIC" length="3"/>
     </parse>
 </j8583-config>

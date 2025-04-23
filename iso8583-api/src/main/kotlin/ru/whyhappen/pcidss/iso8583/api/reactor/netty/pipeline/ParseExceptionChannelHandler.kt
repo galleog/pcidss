@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler
+package ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline
 
 import com.github.kpavlov.jreactive8583.iso.MessageClass
 import com.github.kpavlov.jreactive8583.iso.MessageFactory
@@ -8,6 +8,7 @@ import com.solab.iso8583.IsoMessage
 import com.solab.iso8583.IsoType
 import io.netty.channel.ChannelHandlerContext
 import io.netty.channel.ChannelInboundHandlerAdapter
+import io.netty.handler.codec.DecoderException
 import java.text.ParseException
 
 /**
@@ -16,16 +17,19 @@ import java.text.ParseException
  *
  * @see com.github.kpavlov.jreactive8583.netty.pipeline.ParseExceptionHandler
  */
-open class ParseExceptionHandler(
+open class ParseExceptionChannelHandler(
     protected val isoMessageFactory: MessageFactory<IsoMessage>,
     protected val includeErrorDetails: Boolean = true
 ) : ChannelInboundHandlerAdapter() {
     @Deprecated("Deprecated in Java")
     @Throws(Exception::class)
     override fun exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-        if (cause is ParseException) {
-            val message = createErrorResponseMessage(cause)
-            ctx.writeAndFlush(message)
+        if (cause is DecoderException) {
+            val originalCause = cause.cause
+            if (originalCause is ParseException) {
+                val message = createErrorResponseMessage(originalCause)
+                ctx.writeAndFlush(message)
+            }
         }
         ctx.fireExceptionCaught(cause)
     }
@@ -40,7 +44,7 @@ open class ParseExceptionHandler(
             MessageOrigin.OTHER
         )
 
-        // 650 (Unable to parse message)
+        // 650 (Unable to parse the message)
         message.setValue(24, 650, IsoType.NUMERIC, 3)
 
         if (includeErrorDetails) {

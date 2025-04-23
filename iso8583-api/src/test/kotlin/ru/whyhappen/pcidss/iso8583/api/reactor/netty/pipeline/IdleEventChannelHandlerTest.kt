@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler
+package ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline
 
 import com.github.kpavlov.jreactive8583.iso.MessageClass
 import com.github.kpavlov.jreactive8583.iso.MessageFactory
@@ -18,20 +18,20 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * Tests for [IdleEventHandler].
+ * Tests for [IdleEventChannelHandler].
  */
 @ExtendWith(MockKExtension::class)
-class IdleEventHandlerTest {
+class IdleEventChannelHandlerTest {
     @MockK(relaxed = true)
     private lateinit var ctx: ChannelHandlerContext
     @MockK
     private lateinit var messageFactory: MessageFactory<IsoMessage>
 
-    private lateinit var handler: IdleEventHandler
+    private lateinit var handler: IdleEventChannelHandler
 
     @BeforeTest
     fun setUp() {
-        handler = IdleEventHandler(messageFactory)
+        handler = IdleEventChannelHandler(messageFactory)
 
         every {
             messageFactory.newMessage(

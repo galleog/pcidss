@@ -23,6 +23,10 @@ class CompositeIsoMessageHandler(
      */
     private val exceptionHandler: ExceptionHandler
 ) {
+    companion object {
+        private val logger = LoggerFactory.getLogger(CompositeIsoMessageHandler::class.java)
+    }
+
     /**
      * Handles ISO messages.
      */
@@ -41,7 +45,11 @@ class CompositeIsoMessageHandler(
             mono(Dispatchers.Unconfined) {
                 val handler = messageHandlers.firstOrNull { handler -> handler.supports(message) }
                 if (handler != null) {
-                    logger.debug("Handling IsoMessage[type=0x{}] with {}", "%04X".format(message.type), handler)
+                    logger.debug(
+                        "Handling IsoMessage[type=0x{}] with {}",
+                        "%04X".format(message.type),
+                        handler.javaClass.name
+                    )
 
                     runCatching {
                         handler.onMessage(message)
@@ -53,10 +61,6 @@ class CompositeIsoMessageHandler(
                 }
             }
         }
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(CompositeIsoMessageHandler::class.java)
     }
 }
 

@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler
+package ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline
 
 import com.github.kpavlov.jreactive8583.iso.MessageClass
 import com.github.kpavlov.jreactive8583.iso.MessageFactory
@@ -13,6 +13,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.slot
 import io.mockk.verifySequence
 import io.netty.channel.ChannelHandlerContext
+import io.netty.handler.codec.DecoderException
 import org.junit.jupiter.api.extension.ExtendWith
 import java.text.ParseException
 import kotlin.io.encoding.Base64
@@ -22,24 +23,24 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * Tests for [ParseExceptionHandler].
+ * Tests for [ParseExceptionChannelHandler].
  */
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalEncodingApi::class)
 @ExtendWith(MockKExtension::class)
-class ParseExceptionHandlerTest {
+class ParseExceptionChannelHandlerTest {
     @MockK
     private lateinit var messageFactory: MessageFactory<IsoMessage>
     @MockK(relaxed = true)
     private lateinit var ctx: ChannelHandlerContext
 
-    private lateinit var exceptionHandler: ParseExceptionHandler
+    private lateinit var exceptionHandler: ParseExceptionChannelHandler
     private val exceptionMessage = Base64.encode(Random.nextBytes(30))
-    private val cause = ParseException(exceptionMessage, 0)
+    private val cause = DecoderException(ParseException(exceptionMessage, 0))
 
     @BeforeTest
     fun setUp() {
-        exceptionHandler = ParseExceptionHandler(messageFactory)
+        exceptionHandler = ParseExceptionChannelHandler(messageFactory)
     }
 
     @Test

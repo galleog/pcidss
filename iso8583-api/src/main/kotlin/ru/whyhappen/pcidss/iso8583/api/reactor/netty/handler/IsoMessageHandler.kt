@@ -7,10 +7,10 @@ import com.solab.iso8583.IsoMessage
  */
 interface IsoMessageHandler {
     /**
-     * Indicates if given message can be handled by [onMessage].
+     * Indicates if this handler can handle the incoming message.
      *
      * @param isoMessage the ISO message to check
-     * @return `true` if message should be handled; `false` otherwise
+     * @return `true` if the message should be handled; `false` otherwise
      */
     fun supports(isoMessage: IsoMessage): Boolean
 
