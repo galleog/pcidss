@@ -23,24 +23,24 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * Tests for [ParseExceptionChannelHandler].
+ * Tests for [ParseExceptionHandler].
  */
 @Suppress("DEPRECATION")
 @OptIn(ExperimentalEncodingApi::class)
 @ExtendWith(MockKExtension::class)
-class ParseExceptionChannelHandlerTest {
+class ParseExceptionHandlerTest {
     @MockK
     private lateinit var messageFactory: MessageFactory<IsoMessage>
     @MockK(relaxed = true)
     private lateinit var ctx: ChannelHandlerContext
 
-    private lateinit var exceptionHandler: ParseExceptionChannelHandler
+    private lateinit var exceptionHandler: ParseExceptionHandler
     private val exceptionMessage = Base64.encode(Random.nextBytes(30))
     private val cause = DecoderException(ParseException(exceptionMessage, 0))
 
     @BeforeTest
     fun setUp() {
-        exceptionHandler = ParseExceptionChannelHandler(messageFactory)
+        exceptionHandler = ParseExceptionHandler(messageFactory)
     }
 
     @Test

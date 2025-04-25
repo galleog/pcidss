@@ -17,7 +17,7 @@ import java.text.ParseException
  *
  * @see com.github.kpavlov.jreactive8583.netty.pipeline.ParseExceptionHandler
  */
-open class ParseExceptionChannelHandler(
+open class ParseExceptionHandler(
     protected val isoMessageFactory: MessageFactory<IsoMessage>,
     protected val includeErrorDetails: Boolean = true
 ) : ChannelInboundHandlerAdapter() {

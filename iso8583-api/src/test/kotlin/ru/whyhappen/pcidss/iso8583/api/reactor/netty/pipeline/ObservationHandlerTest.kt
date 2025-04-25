@@ -23,11 +23,11 @@ import reactor.netty.*
 import reactor.netty.tcp.TcpClient
 import ru.whyhappen.pcidss.iso8583.api.j8583.CurrentTimeTraceNumberGenerator
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationChannelHandler.Companion.IN_MTI_TAG
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationChannelHandler.Companion.OBSERVATION_NAME
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationChannelHandler.Companion.OUT_MTI_TAG
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationChannelHandler.Companion.REQUEST_PROCESSED_EVENT
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationChannelHandler.Companion.REQUEST_RECEIVED_EVENT
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationHandler.Companion.IN_MTI_TAG
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationHandler.Companion.OBSERVATION_NAME
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationHandler.Companion.OUT_MTI_TAG
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationHandler.Companion.REQUEST_PROCESSED_EVENT
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationHandler.Companion.REQUEST_RECEIVED_EVENT
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
 import java.net.SocketAddress
 import java.nio.charset.StandardCharsets
@@ -35,10 +35,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Tests for [ObservationChannelHandler].
+ * Tests for [ObservationHandler].
  */
 //@ExtendWith(MockKExtension::class)
-class ObservationChannelHandlerTest : SampleTestRunner() {
+class ObservationHandlerTest : SampleTestRunner() {
     private val messageFactory by lazy { messageFactory() }
     private val port = TestSocketUtils.findAvailableTcpPort()
 

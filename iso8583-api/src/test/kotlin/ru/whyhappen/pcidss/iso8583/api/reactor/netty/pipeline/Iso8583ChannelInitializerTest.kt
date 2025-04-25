@@ -31,9 +31,9 @@ class Iso8583ChannelInitializerTest {
     @MockK(relaxed = true)
     private lateinit var pipeline: ChannelPipeline
     @MockK
-    private lateinit var parseExceptionChannelHandler: ChannelHandler
+    private lateinit var parseExceptionHandler: ChannelHandler
     @MockK
-    private lateinit var idleEventChannelHandler: ChannelHandler
+    private lateinit var idleEventHandler: ChannelHandler
     @MockK
     private lateinit var messageFactory: MessageFactory<IsoMessage>
     @MockK
@@ -88,7 +88,7 @@ class Iso8583ChannelInitializerTest {
             pipeline.addBefore(NettyPipeline.ReactiveBridge, ISO8583_DECODER, any<Iso8583Decoder>())
             pipeline.addBefore(NettyPipeline.ReactiveBridge, ISO8583_ENCODER, any<Iso8583Encoder>())
             pipeline.addBefore(NettyPipeline.ReactiveBridge, OBSERVATION_HANDLER, any<ChannelHandler>())
-            pipeline.addBefore(NettyPipeline.ReactiveBridge, REPLY_ON_ERROR_HANDLER, parseExceptionChannelHandler)
+            pipeline.addBefore(NettyPipeline.ReactiveBridge, REPLY_ON_ERROR_HANDLER, parseExceptionHandler)
         }
     }
 
@@ -104,7 +104,7 @@ class Iso8583ChannelInitializerTest {
             pipeline.addBefore(NettyPipeline.ReactiveBridge, ISO8583_ENCODER, any<Iso8583Encoder>())
             pipeline.addBefore(NettyPipeline.ReactiveBridge, OBSERVATION_HANDLER, any<ChannelHandler>())
             pipeline.addBefore(NettyPipeline.ReactiveBridge, IDLE_STATE_HANDLER, any<IdleStateHandler>())
-            pipeline.addAfter(IDLE_STATE_HANDLER, IDLE_EVENT_HANDLER, idleEventChannelHandler)
+            pipeline.addAfter(IDLE_STATE_HANDLER, IDLE_EVENT_HANDLER, idleEventHandler)
         }
     }
 
@@ -112,7 +112,7 @@ class Iso8583ChannelInitializerTest {
         observationRegistry,
         configBuilder.build(),
         messageFactory,
-        parseExceptionChannelHandler,
-        idleEventChannelHandler
+        parseExceptionHandler,
+        idleEventHandler
     )
 }

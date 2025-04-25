@@ -12,9 +12,9 @@ import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.CompositeIsoMessage
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.DefaultExceptionHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.ExceptionHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.IdleEventChannelHandler
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.IdleEventHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.Iso8583ChannelInitializer
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ParseExceptionChannelHandler
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ParseExceptionHandler
 
 /**
  * Server to handle ISO8583 messages.
@@ -26,8 +26,8 @@ class Iso8583Server(
     private val isoMessageFactory: MessageFactory<IsoMessage>,
     messageHandlers: List<IsoMessageHandler>,
     exceptionHandler: ExceptionHandler = DefaultExceptionHandler(isoMessageFactory),
-    private val parseExceptionChannelHandler: ChannelHandler = ParseExceptionChannelHandler(isoMessageFactory),
-    private val idleEventChannelHandler: ChannelHandler = IdleEventChannelHandler(isoMessageFactory)
+    private val parseExceptionHandler: ChannelHandler = ParseExceptionHandler(isoMessageFactory),
+    private val idleEventHandler: ChannelHandler = IdleEventHandler(isoMessageFactory)
 ) {
     private val tcpServer: TcpServer by lazy { createTcpServer() }
     private val compositeIsoMessageHandler = CompositeIsoMessageHandler(messageHandlers, exceptionHandler)
@@ -45,7 +45,7 @@ class Iso8583Server(
      */
     fun start() {
         if (disposableServer == null) {
-            kotlin.runCatching {
+            runCatching {
                 disposableServer = tcpServer.bindNow()
                 tcpServer
             }.onSuccess { server ->
@@ -75,8 +75,8 @@ class Iso8583Server(
                     observationRegistry,
                     configuration,
                     isoMessageFactory,
-                    parseExceptionChannelHandler,
-                    idleEventChannelHandler
+                    parseExceptionHandler,
+                    idleEventHandler
                 )
             ).handle { inbound, outbound -> compositeIsoMessageHandler.handle(inbound, outbound) }
     }

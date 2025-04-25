@@ -18,20 +18,20 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * Tests for [IdleEventChannelHandler].
+ * Tests for [IdleEventHandler].
  */
 @ExtendWith(MockKExtension::class)
-class IdleEventChannelHandlerTest {
+class IdleEventHandlerTest {
     @MockK(relaxed = true)
     private lateinit var ctx: ChannelHandlerContext
     @MockK
     private lateinit var messageFactory: MessageFactory<IsoMessage>
 
-    private lateinit var handler: IdleEventChannelHandler
+    private lateinit var handler: IdleEventHandler
 
     @BeforeTest
     fun setUp() {
-        handler = IdleEventChannelHandler(messageFactory)
+        handler = IdleEventHandler(messageFactory)
 
         every {
             messageFactory.newMessage(

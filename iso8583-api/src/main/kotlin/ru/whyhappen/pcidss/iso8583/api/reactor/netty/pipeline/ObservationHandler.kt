@@ -11,7 +11,7 @@ import io.netty.util.AttributeKey
 /**
  * Enables observability for processing of [IsoMessage]s.
  */
-class ObservationChannelHandler(private val observationRegistry: ObservationRegistry) : ChannelDuplexHandler() {
+class ObservationHandler(private val observationRegistry: ObservationRegistry) : ChannelDuplexHandler() {
     companion object {
         internal const val OBSERVATION_NAME = "iso8583.request"
         internal const val IN_MTI_TAG = "iso8583.in.mti"

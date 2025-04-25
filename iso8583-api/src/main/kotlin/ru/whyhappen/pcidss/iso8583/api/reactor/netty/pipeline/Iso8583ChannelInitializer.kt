@@ -49,11 +49,11 @@ class Iso8583ChannelInitializer<T : ConnectorConfiguration>(
     /**
      * Handles exceptions thrown when parsing ISO messages.
      */
-    private val parseExceptionChannelHandler: ChannelHandler = ParseExceptionChannelHandler(isoMessageFactory),
+    private val parseExceptionHandler: ChannelHandler = ParseExceptionHandler(isoMessageFactory),
     /**
      * Sends heartbeats when the channel becomes idle.
      */
-    private val idleEventChannelHandler: ChannelHandler = IdleEventChannelHandler(isoMessageFactory)
+    private val idleEventHandler: ChannelHandler = IdleEventHandler(isoMessageFactory)
 ) : ChannelPipelineConfigurer {
     override fun onChannelInit(
         connectionObserver: ConnectionObserver,
@@ -70,11 +70,11 @@ class Iso8583ChannelInitializer<T : ConnectorConfiguration>(
                 addBefore(baseName, LOGGING_HANDLER, createLoggingHandler(configuration))
             }
             if (configuration.replyOnError()) {
-                addBefore(baseName, REPLY_ON_ERROR_HANDLER, parseExceptionChannelHandler)
+                addBefore(baseName, REPLY_ON_ERROR_HANDLER, parseExceptionHandler)
             }
             if (configuration.shouldAddEchoMessageListener()) {
                 addBefore(baseName, IDLE_STATE_HANDLER, IdleStateHandler(0, 0, configuration.idleTimeout))
-                addAfter(IDLE_STATE_HANDLER, IDLE_EVENT_HANDLER, idleEventChannelHandler)
+                addAfter(IDLE_STATE_HANDLER, IDLE_EVENT_HANDLER, idleEventHandler)
             }
         }
     }
@@ -89,7 +89,7 @@ class Iso8583ChannelInitializer<T : ConnectorConfiguration>(
         Iso8583Decoder(messageFactory)
 
     private fun createObservationHandler(observationRegistry: ObservationRegistry): ChannelHandler =
-        ObservationChannelHandler(observationRegistry)
+        ObservationHandler(observationRegistry)
 
     private fun createLoggingHandler(configuration: T): ChannelHandler =
         IsoMessageLoggingHandler(

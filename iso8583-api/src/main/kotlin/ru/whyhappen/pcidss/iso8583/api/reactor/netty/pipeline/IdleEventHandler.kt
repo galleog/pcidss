@@ -14,7 +14,7 @@ import io.netty.handler.timeout.IdleStateEvent
  *
  * @see com.github.kpavlov.jreactive8583.netty.pipeline.IdleEventHandler
  */
-open class IdleEventChannelHandler(
+open class IdleEventHandler(
     protected val isoMessageFactory: MessageFactory<IsoMessage>
 ) : ChannelInboundHandlerAdapter() {
     override fun userEventTriggered(ctx: ChannelHandlerContext, evt: Any) {
