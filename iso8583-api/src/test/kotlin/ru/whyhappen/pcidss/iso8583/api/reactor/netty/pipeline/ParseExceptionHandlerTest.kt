@@ -1,89 +1,73 @@
 package ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline
 
 import com.github.kpavlov.jreactive8583.iso.MessageClass
-import com.github.kpavlov.jreactive8583.iso.MessageFactory
 import com.github.kpavlov.jreactive8583.iso.MessageFunction
 import com.github.kpavlov.jreactive8583.iso.MessageOrigin
 import com.solab.iso8583.IsoMessage
-import com.solab.iso8583.IsoType
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
-import io.mockk.slot
-import io.mockk.verifySequence
-import io.netty.channel.ChannelHandlerContext
-import io.netty.handler.codec.DecoderException
-import org.junit.jupiter.api.extension.ExtendWith
-import java.text.ParseException
-import kotlin.io.encoding.Base64
-import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlin.random.Random
-import kotlin.test.BeforeTest
+import io.kotest.matchers.string.shouldHaveMaxLength
+import io.micrometer.observation.tck.TestObservationRegistry
+import org.awaitility.kotlin.atMost
+import org.awaitility.kotlin.await
+import org.awaitility.kotlin.untilNotNull
+import reactor.kotlin.core.publisher.cast
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.DefaultHelperIT
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.HelperIT
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
+import java.time.ZonedDateTime
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.test.Test
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Tests for [ParseExceptionHandler].
  */
-@Suppress("DEPRECATION")
-@OptIn(ExperimentalEncodingApi::class)
-@ExtendWith(MockKExtension::class)
-class ParseExceptionHandlerTest {
-    @MockK
-    private lateinit var messageFactory: MessageFactory<IsoMessage>
-    @MockK(relaxed = true)
-    private lateinit var ctx: ChannelHandlerContext
-
-    private lateinit var exceptionHandler: ParseExceptionHandler
-    private val exceptionMessage = Base64.encode(Random.nextBytes(30))
-    private val cause = DecoderException(ParseException(exceptionMessage, 0))
-
-    @BeforeTest
-    fun setUp() {
-        exceptionHandler = ParseExceptionHandler(messageFactory)
-    }
+class ParseExceptionHandlerTest : HelperIT by DefaultHelperIT() {
+    private val observationRegistry = TestObservationRegistry.create()
 
     @Test
-    fun `should create an administrative message`() {
-        every {
-            messageFactory.newMessage(
-                MessageClass.ADMINISTRATIVE,
-                MessageFunction.NOTIFICATION,
-                MessageOrigin.OTHER
-            )
-        } returns IsoMessage().apply {
-            type = MESSAGE_TYPE
+    fun `should reply with an administrative message on ParseException`() {
+        val adminMessage = AtomicReference<IsoMessage>()
+
+        val messageHandler = object : IsoMessageHandler {
+            override fun supports(isoMessage: IsoMessage): Boolean = false
+            override suspend fun onMessage(inbound: IsoMessage): IsoMessage? = null
+        }
+        val server = createServer(messageHandler, observationRegistry) {
+            addLoggingHandler(true)
+            replyOnError(true)
+        }
+        server.start()
+
+        val connection = createClient { inbound, outbound ->
+            inbound.receiveObject()
+                .cast<IsoMessage>()
+                .subscribe { msg -> adminMessage.set(msg) }
+
+            outbound.sendObject(
+                messageFactory.newMessage(
+                    MessageClass.FINANCIAL,
+                    MessageFunction.RESERVED_8,
+                    MessageOrigin.ACQUIRER
+                )
+            ).neverComplete()
+        }.connectNow()
+
+        await atMost 5.seconds untilNotNull { adminMessage.get() }
+
+        with(adminMessage.get()) {
+            type shouldBe 0x0644
+            getObjectValue<ZonedDateTime>(7).shouldNotBeNull()
+            getObjectValue<String>(11).shouldNotBeNull()
+            getObjectValue<String>(24) shouldBe "650"
+
+            val field44Value = getObjectValue<String>(44)
+            field44Value.shouldNotBeNull()
+            field44Value shouldHaveMaxLength 25
         }
 
-        val messageSlot = slot<IsoMessage>()
-        exceptionHandler.exceptionCaught(ctx, cause)
-
-        verifySequence {
-            messageFactory.newMessage(
-                MessageClass.ADMINISTRATIVE,
-                MessageFunction.NOTIFICATION,
-                MessageOrigin.OTHER
-            )
-            ctx.writeAndFlush(capture(messageSlot))
-            ctx.fireExceptionCaught(cause)
-        }
-
-        messageSlot.captured.type shouldBe MESSAGE_TYPE
-
-        with(messageSlot.captured.getAt<Any>(24)) {
-            type shouldBe IsoType.NUMERIC
-            length shouldBe 3
-            value shouldBe 650
-        }
-
-        with(messageSlot.captured.getAt<Any>(44)) {
-            type shouldBe IsoType.LLVAR
-            length shouldBe 25
-            value shouldBe exceptionMessage.take(22) + "..."
-        }
-    }
-
-    companion object {
-        private const val MESSAGE_TYPE = 0x1644
+        connection.disposeNow()
+        server.stop()
     }
 }
