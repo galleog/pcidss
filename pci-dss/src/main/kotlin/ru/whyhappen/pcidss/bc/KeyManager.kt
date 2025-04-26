@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.StandardOpenOption
+import java.nio.file.StandardOpenOption.*
 import java.security.*
 import java.security.cert.CertificateException
 import javax.crypto.KeyGenerator
@@ -40,8 +40,8 @@ class KeyManager(
 ) {
     val path: Path = Path.of(keystorePath)
 
-    private lateinit var currentKey: Key
-    private var previousKey: Key? = null
+    internal lateinit var currentKey: Key
+    internal var previousKey: Key? = null
 
     /**
      * Verifies if the keystore exists.
@@ -67,7 +67,7 @@ class KeyManager(
 
         if (keystoreExists) {
             // read keys from the keystore
-            Files.newInputStream(path, StandardOpenOption.READ).use {
+            Files.newInputStream(path, READ).use {
                 keystore.load(it, keystorePassArray)
             }
 
@@ -84,7 +84,7 @@ class KeyManager(
 
             logger.info("New keystore $path has been created")
 
-            Files.newOutputStream(path, StandardOpenOption.WRITE,StandardOpenOption.CREATE_NEW).use {
+            Files.newOutputStream(path, WRITE, CREATE_NEW).use {
                 keystore.store(it, keystorePassArray)
             }
         }
@@ -117,7 +117,7 @@ class KeyManager(
 
         logger.info("Secret key has been updated in keystore $path")
 
-        Files.newOutputStream(path, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING).use {
+        Files.newOutputStream(path, WRITE, TRUNCATE_EXISTING).use {
             keystore.store(it, keystorePassArray)
         }
     }
@@ -132,7 +132,7 @@ class KeyManager(
         NoSuchProviderException::class,
         InvalidKeyException::class
     )
-    private fun calculateCurrentHmac(data: ByteArray): ByteArray = calculateHmac(currentKey, data)
+    fun calculateCurrentHmac(data: ByteArray): ByteArray = calculateHmac(currentKey, data)
 
     /**
      * Calculates HMAC SHA256 using the previous key.
@@ -149,7 +149,7 @@ class KeyManager(
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(KeyManager::class.java)
 
-        private fun generateHmacKey(): SecretKey =
+        internal fun generateHmacKey(): SecretKey =
             KeyGenerator.getInstance("HmacSHA256", "BCFIPS").run {
                 init(256, RandomHolder.secureRandom)
                 generateKey()
