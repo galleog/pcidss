@@ -149,7 +149,7 @@ class KeyManager(
     companion object {
         private val logger: Logger = LoggerFactory.getLogger(KeyManager::class.java)
 
-        internal fun generateHmacKey(): SecretKey =
+        private fun generateHmacKey(): SecretKey =
             KeyGenerator.getInstance("HmacSHA256", "BCFIPS").run {
                 init(256, RandomHolder.secureRandom)
                 generateKey()

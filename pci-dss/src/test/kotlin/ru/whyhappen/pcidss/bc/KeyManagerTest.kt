@@ -15,6 +15,8 @@ import java.security.Key
 import java.security.KeyStore
 import java.security.Security
 import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
+import kotlin.random.Random
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -63,8 +65,8 @@ class KeyManagerTest {
 
     @Test
     fun `should read keys from an existing keystore`() {
-        val currentKey = KeyManager.generateHmacKey()
-        val previousKey = KeyManager.generateHmacKey()
+        val currentKey = getSecretKey()
+        val previousKey = getSecretKey()
         createKeystoreWithKeys(currentKey, previousKey)
 
         val keyManager = keyManager(keystoreFile.toString())
@@ -76,8 +78,8 @@ class KeyManagerTest {
 
     @Test
     fun `should update the current key`() {
-        val currentKey = KeyManager.generateHmacKey()
-        val previousKey = KeyManager.generateHmacKey()
+        val currentKey = getSecretKey()
+        val previousKey = getSecretKey()
         createKeystoreWithKeys(currentKey, previousKey)
 
         val keyManager = keyManager(keystoreFile.toString())
@@ -115,4 +117,6 @@ class KeyManagerTest {
         require(Files.exists(keystoreFile)) { "Keystore file does not exist after creation" }
         require(Files.size(keystoreFile) > 0) { "Keystore file is empty after creation" }
     }
+
+    private fun getSecretKey(): SecretKey = SecretKeySpec(Random.nextBytes(16), "HmacSHA256")
 }
