@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.0.21"
-spring-boot = "3.4.2"
+spring-boot = "3.4.5"
 jreactive8583 = "1.5.1"
 bc-fips = "2.1.0"
 mockk = "1.13.17"
