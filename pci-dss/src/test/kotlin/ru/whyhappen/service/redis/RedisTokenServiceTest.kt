@@ -11,6 +11,7 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.spyk
 import io.mockk.verifySequence
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -68,7 +69,7 @@ class RedisTokenServiceTest {
     }
 
     @BeforeTest
-    fun setUp() = runTest {
+    fun setUp(): Unit = runBlocking {
         redisTemplate.connectionFactory.reactiveConnection.serverCommands().flushDb().awaitSingle()
 
         every { keyRepository.currentKey } returns currentKey
