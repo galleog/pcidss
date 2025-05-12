@@ -53,7 +53,7 @@ class BasicIsoMessageHandler(
             .apply {
                 // copy fields to the response message
                 for ((key, value) in respBody.fields) {
-                    if (hasField(key)) {
+                    if (key !in sensitiveDataFields && hasField(key)) {
                         updateValue(key, value)
                     } else {
                         logger.warn(

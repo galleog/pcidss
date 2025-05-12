@@ -68,6 +68,7 @@ class BasicIsoMessageHandlerTest {
     fun `should tokenize fields and update fields set by the external service`() = runTest {
         val mockResponse = """{
                 "fields": {
+                    "2": "token1",
                     "39": "01"
                 }
             }""".trimIndent()

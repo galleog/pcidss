@@ -9,6 +9,7 @@ spring:
       lettuce:
         pool:
           enabled: true
+
   sql:
     init:
       mode: never
