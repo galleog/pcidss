@@ -11,17 +11,34 @@ import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
 import ru.whyhappen.service.TokenService
 
 /**
- * Basic message handler for all types of ISO8583 messages.
+ * General message handler that works for almost all types of ISO8583 messages.
+ * It tokenizes sensitive data fields of an ISO message and sends the message to an external service for processing.
+ * Then uses the data it gets from that service to send an ISO response message.
  */
-class BasicIsoMessageHandler(
+class GeneralIsoMessageHandler(
+    /**
+     * List of sensitive data fields to tokenize.
+     */
     private val sensitiveDataFields: List<Int>,
+    /**
+     * ISO8583 message factory.
+     */
     private val messageFactory: MessageFactory<IsoMessage>,
+    /**
+     * Service to get tokens for sensitive data fields.
+     */
     private val tokenService: TokenService,
+    /**
+     * Web client for sending an HTTP request to an external service.
+     */
     private val webClient: WebClient,
+    /**
+     * Optional customizer for an ISO response message.
+     */
     private val customizer: IsoMessageCustomizer? = null,
 ) : IsoMessageHandler {
     companion object {
-        private val logger = LoggerFactory.getLogger(BasicIsoMessageHandler::class.java)
+        private val logger = LoggerFactory.getLogger(GeneralIsoMessageHandler::class.java)
     }
 
     override fun supports(isoMessage: IsoMessage): Boolean = true

@@ -15,7 +15,7 @@ import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.web.reactive.function.client.WebClient
-import ru.whyhappen.pcidss.iso8583.BasicIsoMessageHandler
+import ru.whyhappen.pcidss.iso8583.GeneralIsoMessageHandler
 import ru.whyhappen.pcidss.iso8583.IsoMessageCustomizer
 import ru.whyhappen.pcidss.iso8583.api.j8583.CurrentTimeTraceNumberGenerator
 import ru.whyhappen.pcidss.iso8583.api.j8583.config.JsonResourceMessageFactoryConfigurer
@@ -112,14 +112,14 @@ class Iso8583ServerConfiguration {
 
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)
-    fun defaultIsoMessageHandler(
+    fun generalIsoMessageHandler(
         properties: Iso8583Properties,
         messageFactory: MessageFactory<IsoMessage>,
         tokenService: TokenService,
         webClient: WebClient,
         customizer: ObjectProvider<IsoMessageCustomizer>
     ): IsoMessageHandler {
-        return BasicIsoMessageHandler(
+        return GeneralIsoMessageHandler(
             properties.message.sensitiveDataFields,
             messageFactory,
             tokenService,

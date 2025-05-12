@@ -26,10 +26,10 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * Tests for [BasicIsoMessageHandler].
+ * Tests for [GeneralIsoMessageHandler].
  */
 @ExtendWith(MockKExtension::class)
-class BasicIsoMessageHandlerTest {
+class GeneralIsoMessageHandlerTest {
     @MockK
     private lateinit var messageFactory: MessageFactory<IsoMessage>
     @MockK
@@ -38,7 +38,7 @@ class BasicIsoMessageHandlerTest {
     private lateinit var customizer: IsoMessageCustomizer
 
     private lateinit var webClient: WebClient
-    private lateinit var handler: BasicIsoMessageHandler
+    private lateinit var handler: GeneralIsoMessageHandler
 
     companion object {
         private lateinit var mockWebServer: MockWebServer
@@ -105,7 +105,7 @@ class BasicIsoMessageHandlerTest {
         coEvery { tokenService.getToken(inboundMessage.getObjectValue(35)) } returns "token2"
         every { messageFactory.createResponse(inboundMessage) } returns responseMessage
 
-        handler = BasicIsoMessageHandler(listOf(2, 35), messageFactory, tokenService, webClient, customizer)
+        handler = GeneralIsoMessageHandler(listOf(2, 35), messageFactory, tokenService, webClient, customizer)
         val result = handler.onMessage(inboundMessage)
 
         val recordedRequest = mockWebServer.takeRequest()

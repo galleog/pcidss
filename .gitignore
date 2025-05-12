@@ -22,6 +22,7 @@ bin/
 *.iml
 *.ipr
 out/
+.qodo/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
