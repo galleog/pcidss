@@ -22,9 +22,9 @@ data class KeystoreProperties(
     /**
      * Alias for the current secret key.
      */
-    var currentKeyAlias: String = "current",
+    var currentKeyAlias: String = "currentKey",
     /**
      * Alias for the previous secret key.
      */
-    var previousKeyAlias: String = "previous",
+    var previousKeyAlias: String = "previousKey",
 )

@@ -164,7 +164,7 @@ class LooseMessageFactory<T : IsoMessage> : MessageFactory<T>() {
         val index = parseOrder[type] ?: parseOrder[-1]
         if (parseGuide == null || index == null) {
             val errMsg =
-                "ISO8583 MessageFactory has no parsing guide for message type 0x${"%04X".format(type)} [${String(buf)}]"
+                "ISO8583 MessageFactory has no parsing guide for message type 0x${"%04x".format(type)} [${String(buf)}]"
             log.error(errMsg)
             throw ParseException(errMsg, 0)
         }
@@ -174,7 +174,7 @@ class LooseMessageFactory<T : IsoMessage> : MessageFactory<T>() {
             if (bs[i] && !index.contains(i + 1)) {
                 log.warn(
                     "ISO8583 MessageFactory cannot parse field {}: unspecified in parsing guide for type 0x{}",
-                    i + 1, "%04X".format(type)
+                    i + 1, "%04x".format(type)
                 )
                 throw ParseException("ISO8583 MessageFactory cannot parse fields", 0)
             }

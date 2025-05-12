@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.bc
+package ru.whyhappen.service.bcfips
 
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
@@ -22,9 +22,9 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 /**
- * Tests for [KeyManager].
+ * Tests for [BcFipsKeystoreManager].
  */
-class KeyManagerTest {
+class BcFipsKeystoreManagerTest {
     private val keystorePassword = "password"
     private val keyPassword = "keyPassword"
     private val currentKeyAlias = "currentKey"
@@ -55,12 +55,12 @@ class KeyManagerTest {
         val keystorePath = keystoreFile.toString()
         Files.deleteIfExists(keystoreFile)
 
-        val keyManager = keyManager(keystorePath)
-        keyManager.init()
+        val keystoreManager = keystoreManager(keystorePath)
+        keystoreManager.init()
 
         Files.exists(keystoreFile).shouldBeTrue()
-        keyManager.currentKey.shouldBeInstanceOf<Key>()
-        keyManager.previousKey.shouldBeNull()
+        keystoreManager.currentKey.shouldBeInstanceOf<Key>()
+        keystoreManager.previousKey.shouldBeNull()
     }
 
     @Test
@@ -69,11 +69,11 @@ class KeyManagerTest {
         val previousKey = getSecretKey()
         createKeystoreWithKeys(currentKey, previousKey)
 
-        val keyManager = keyManager(keystoreFile.toString())
-        keyManager.init()
+        val keystoreManager = keystoreManager(keystoreFile.toString())
+        keystoreManager.init()
 
-        keyManager.currentKey shouldBe currentKey
-        keyManager.previousKey shouldBe previousKey
+        keystoreManager.currentKey shouldBe currentKey
+        keystoreManager.previousKey shouldBe previousKey
     }
 
     @Test
@@ -82,16 +82,16 @@ class KeyManagerTest {
         val previousKey = getSecretKey()
         createKeystoreWithKeys(currentKey, previousKey)
 
-        val keyManager = keyManager(keystoreFile.toString())
-        keyManager.init()
-        keyManager.updateSecretKey()
+        val keystoreManager = keystoreManager(keystoreFile.toString())
+        keystoreManager.init()
+        keystoreManager.updateSecretKey()
 
-        keyManager.currentKey.shouldNotBeNull()
-        keyManager.currentKey shouldNotBe currentKey
-        keyManager.previousKey shouldBe currentKey
+        keystoreManager.currentKey.shouldNotBeNull()
+        keystoreManager.currentKey shouldNotBe currentKey
+        keystoreManager.previousKey shouldBe currentKey
     }
 
-    private fun keyManager(keystorePath: String) = KeyManager(
+    private fun keystoreManager(keystorePath: String) = BcFipsKeystoreManager(
         keystorePath,
         keystorePassword,
         keyPassword,

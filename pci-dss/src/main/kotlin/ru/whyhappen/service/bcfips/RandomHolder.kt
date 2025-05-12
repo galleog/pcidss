@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.bc
+package ru.whyhappen.service.bcfips
 
 import org.bouncycastle.crypto.EntropySourceProvider
 import org.bouncycastle.crypto.fips.FipsDRBG

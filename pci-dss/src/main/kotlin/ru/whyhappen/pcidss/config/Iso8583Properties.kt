@@ -18,7 +18,7 @@ data class Iso8583Properties(
     /**
      * Properties for ISO8583 messages.
      */
-    var message: Iso9583MessageProperties = Iso9583MessageProperties()
+    var message: Iso8583MessageProperties = Iso8583MessageProperties()
 )
 
 /**
@@ -50,7 +50,7 @@ data class ConnectionProperties(
      */
     var addLoggingHandler: Boolean = false,
     /**
-     * Indicates if sensitive data specified in [Iso9583MessageProperties.sensitiveDataFields]
+     * Indicates if sensitive data specified in [Iso8583MessageProperties.sensitiveDataFields]
      * should be masked in the log.
      */
     var logSensitiveData: Boolean = false,
@@ -63,7 +63,7 @@ data class ConnectionProperties(
 /**
  * Properties to create and parse ISO8583 messages.
  */
-data class Iso9583MessageProperties(
+data class Iso8583MessageProperties(
     /**
      * ISO8583 version.
      */

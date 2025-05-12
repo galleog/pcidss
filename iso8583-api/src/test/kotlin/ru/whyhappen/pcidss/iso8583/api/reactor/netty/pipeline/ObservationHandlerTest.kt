@@ -12,8 +12,8 @@ import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilTrue
 import reactor.kotlin.core.publisher.cast
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.DefaultHelperIT
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.HelperIT
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.DefaultTcpTestHelper
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.TcpTestHelper
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationHandler.Companion.IN_MTI_TAG
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ObservationHandler.Companion.OBSERVATION_NAME
@@ -26,7 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Tests for [ObservationHandler].
  */
-class ObservationHandlerTest : SampleTestRunner(), HelperIT by DefaultHelperIT() {
+class ObservationHandlerTest : SampleTestRunner(), TcpTestHelper by DefaultTcpTestHelper() {
     override fun getTracingSetup(): Array<TracingSetup> = arrayOf(TracingSetup.IN_MEMORY_OTEL)
 
     override fun yourCode(): SampleTestRunnerConsumer = SampleTestRunnerConsumer { bb, _ ->

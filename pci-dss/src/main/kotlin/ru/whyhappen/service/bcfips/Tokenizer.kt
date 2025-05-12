@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.bc
+package ru.whyhappen.service.bcfips
 
 import java.security.SecureRandom
 import kotlin.io.encoding.Base64

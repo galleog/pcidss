@@ -42,22 +42,29 @@ class CompositeIsoMessageHandler(
 
     private fun processMessage(message: IsoMessage): Mono<IsoMessage> {
         return Mono.defer {
+            var response: IsoMessage? = null
             mono(Dispatchers.Unconfined) {
                 val handler = messageHandlers.firstOrNull { handler -> handler.supports(message) }
                 if (handler != null) {
                     logger.debug(
                         "Handling IsoMessage[type=0x{}] with {}",
-                        "%04X".format(message.type),
+                        "%04x".format(message.type),
                         handler.javaClass.name
                     )
 
                     runCatching {
-                        handler.onMessage(message)
+                        response = handler.onMessage(message)
                     }.getOrElse { e ->
-                        exceptionHandler.handleException(message, e)
+                        logger.error("Error while handling IsoMessage[type=0x{}]", "%04x".format(message.type), e)
+                        response = exceptionHandler.handleException(message, e)
                     }
                 } else {
-                    exceptionHandler.handleException(message, IsoHandlerNotFoundException(message))
+                    logger.warn("No suitable handler found for IsoMessage[type=0x{}]", "%04x".format(message.type))
+                    response = exceptionHandler.handleException(message, IsoHandlerNotFoundException(message))
+                }
+
+                response?.also {
+                    logger.info("Sending outgoing IsoMessage[type=0x{}]", "%04x".format(it.type))
                 }
             }
         }
@@ -68,5 +75,5 @@ class CompositeIsoMessageHandler(
  * Exception thrown when no [IsoMessageHandler] found for an incoming [IsoMessage].
  */
 class IsoHandlerNotFoundException(val isoMessage: IsoMessage) : RuntimeException() {
-    override val message: String = "Message handler not found for IsoMessage[type=0x${"%04X".format(isoMessage.type)}]"
+    override val message: String = "Message handler not found for IsoMessage[type=0x${"%04x".format(isoMessage.type)}]"
 }

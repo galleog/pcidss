@@ -11,13 +11,26 @@ import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.Ordered
+import org.springframework.core.annotation.Order
+import org.springframework.data.redis.core.ReactiveRedisTemplate
+import org.springframework.web.reactive.function.client.WebClient
+import ru.whyhappen.pcidss.iso8583.BasicIsoMessageHandler
+import ru.whyhappen.pcidss.iso8583.IsoMessageCustomizer
 import ru.whyhappen.pcidss.iso8583.api.j8583.CurrentTimeTraceNumberGenerator
 import ru.whyhappen.pcidss.iso8583.api.j8583.config.JsonResourceMessageFactoryConfigurer
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.*
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.DefaultExceptionHandler
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.ExceptionHandler
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.IdleEventHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ParseExceptionHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583ServerBootstrap
+import ru.whyhappen.service.Encryptor
+import ru.whyhappen.service.KeyRepository
+import ru.whyhappen.service.TokenService
+import ru.whyhappen.service.bcfips.BcFipsEncryptor
+import ru.whyhappen.service.redis.RedisTokenService
 
 /**
  * Configuration for [Iso8583Server].
@@ -61,13 +74,13 @@ class Iso8583ServerConfiguration {
     fun messageFactory(
         properties: Iso8583Properties,
         objectMapper: ObjectMapper,
-        traceNumberGenerator: TraceNumberGenerator
+        traceNumberGenerator: ObjectProvider<TraceNumberGenerator>
     ): MessageFactory<IsoMessage> {
         val messageFactory = JsonResourceMessageFactoryConfigurer<IsoMessage>(objectMapper, properties.message.configs)
             .createMessageFactory()
             .apply {
                 // set message factory properties
-                this.traceNumberGenerator = traceNumberGenerator
+                this.traceNumberGenerator = traceNumberGenerator.ifAvailable ?: CurrentTimeTraceNumberGenerator()
                 assignDate = properties.message.assignDate
                 isBinaryHeader = properties.message.binaryHeader
                 isBinaryFields = properties.message.binaryFields
@@ -88,5 +101,30 @@ class Iso8583ServerConfiguration {
     fun iso9593Bootstrap(server: Iso8583Server) = Iso8583ServerBootstrap(server)
 
     @Bean
-    fun traceNumberGenerator(): TraceNumberGenerator = CurrentTimeTraceNumberGenerator()
+    fun encryptor(): Encryptor = BcFipsEncryptor()
+
+    @Bean
+    fun tokenService(
+        redisTemplate: ReactiveRedisTemplate<ByteArray, String>,
+        keyRepository: KeyRepository,
+        encryptor: Encryptor
+    ) : TokenService = RedisTokenService(redisTemplate, keyRepository, encryptor)
+
+    @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE)
+    fun defaultIsoMessageHandler(
+        properties: Iso8583Properties,
+        messageFactory: MessageFactory<IsoMessage>,
+        tokenService: TokenService,
+        webClient: WebClient,
+        customizer: ObjectProvider<IsoMessageCustomizer>
+    ): IsoMessageHandler {
+        return BasicIsoMessageHandler(
+            properties.message.sensitiveDataFields,
+            messageFactory,
+            tokenService,
+            webClient,
+            customizer.ifAvailable
+        )
+    }
 }

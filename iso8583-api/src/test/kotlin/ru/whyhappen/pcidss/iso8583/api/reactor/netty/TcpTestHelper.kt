@@ -27,9 +27,9 @@ import java.net.SocketAddress
 import java.nio.charset.StandardCharsets
 
 /**
- * Helper for integration tests.
+ * Helper for tests that uses [Iso8583Server] and [TcpClient].
  */
-interface HelperIT {
+interface TcpTestHelper {
     val port: Int
     val messageFactory: MessageFactory<IsoMessage>
 
@@ -42,9 +42,9 @@ interface HelperIT {
 }
 
 /**
- * [HelperIT] implementation.
+ * [TcpTestHelper] implementation.
  */
-class DefaultHelperIT : HelperIT {
+class DefaultTcpTestHelper : TcpTestHelper {
     override val port = TestSocketUtils.findAvailableTcpPort()
     override val messageFactory by lazy { messageFactory() }
 
@@ -78,6 +78,7 @@ class DefaultHelperIT : HelperIT {
                 traceNumberGenerator = CurrentTimeTraceNumberGenerator()
                 characterEncoding = StandardCharsets.US_ASCII.name()
                 useBinaryMessages = false
+                isUseDateTimeApi = true
                 assignDate = true
             }
         return J8583MessageFactory(messageFactory, ISO8583Version.V1987, MessageOrigin.ACQUIRER)

@@ -6,6 +6,8 @@ bc-fips = "2.1.0"
 mockk = "1.13.17"
 kotest = "5.9.1"
 awaitility = "4.3.0"
+mockwebserver = "5.0.0-alpha.14"
+jsonpathkt = "3.0.2"
 
 [libraries]
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -16,6 +18,8 @@ bc-fips = { group = "org.bouncycastle", name = "bc-fips", version.ref = "bc-fips
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotest-bom = { group = "io.kotest", name = "kotest-bom", version.ref = "kotest" }
 awaitility-kotlin = { group = "org.awaitility", name = "awaitility-kotlin", version.ref = "awaitility" }
+mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
+jsonpathkt = { group = "com.eygraber", name = "jsonpathkt-kotlinx", version.ref = "jsonpathkt" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }

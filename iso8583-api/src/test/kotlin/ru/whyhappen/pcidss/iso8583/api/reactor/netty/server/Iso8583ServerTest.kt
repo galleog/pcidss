@@ -12,8 +12,8 @@ import org.awaitility.kotlin.atMost
 import org.awaitility.kotlin.await
 import org.awaitility.kotlin.untilNotNull
 import reactor.kotlin.core.publisher.cast
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.DefaultHelperIT
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.HelperIT
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.DefaultTcpTestHelper
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.TcpTestHelper
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.test.Test
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Tests for [Iso8583Server].
  */
-class Iso8583ServerTest : HelperIT by DefaultHelperIT() {
+class Iso8583ServerTest : TcpTestHelper by DefaultTcpTestHelper() {
     private val observationRegistry = TestObservationRegistry.create()
 
     @Test
