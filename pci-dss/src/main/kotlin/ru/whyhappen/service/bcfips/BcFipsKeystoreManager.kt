@@ -11,8 +11,10 @@ import java.nio.file.StandardOpenOption.*
 import java.security.GeneralSecurityException
 import java.security.Key
 import java.security.KeyStore
+import java.time.LocalDateTime
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.spec.SecretKeySpec
 
 /**
  * [KeystoreManager] that uses [Bouncy Castle FIPS](https://www.bouncycastle.org/download/bouncy-castle-java-fips/)
@@ -41,6 +43,8 @@ class BcFipsKeystoreManager(
     private val previousKeyAlias: String
 ) : KeystoreManager, KeyRepository {
     override val keystorePath: Path = Path.of(keystorePath)
+    override lateinit var keystoreDate: LocalDateTime
+        private set
     override lateinit var currentKey: Key
         private set
     override var previousKey: Key? = null
@@ -50,6 +54,8 @@ class BcFipsKeystoreManager(
         get() = Files.exists(keystorePath)
 
     companion object {
+        internal const val DATE_ALIAS = "date"
+
         private val logger: Logger = LoggerFactory.getLogger(BcFipsKeystoreManager::class.java)
 
         private fun generateHmacKey(): SecretKey =
@@ -79,6 +85,7 @@ class BcFipsKeystoreManager(
 
             currentKey = keystore.getKey(currentKeyAlias, keyPassArray)
             previousKey = keystore.getKey(previousKeyAlias, keyPassArray)
+            keystoreDate = LocalDateTime.parse(keystore.getKey(DATE_ALIAS, null).encoded.decodeToString())
 
             logger.info("Keystore $keystorePath has been read")
         } else {
@@ -87,6 +94,15 @@ class BcFipsKeystoreManager(
 
             currentKey = generateHmacKey()
             keystore.setKeyEntry(currentKeyAlias, currentKey, keyPassArray, null)
+            keystore.getCreationDate(currentKeyAlias)
+
+            keystoreDate = LocalDateTime.now()
+            keystore.setKeyEntry(
+                DATE_ALIAS,
+                SecretKeySpec(keystoreDate.toString().toByteArray(), "HmacSHA256"),
+                null,
+                null
+            )
 
             logger.info("New keystore $keystorePath has been created")
 
@@ -117,6 +133,14 @@ class BcFipsKeystoreManager(
         currentKey = generateHmacKey()
         keystore.setKeyEntry(currentKeyAlias, currentKey, keyPassArray, null)
         keystore.setKeyEntry(previousKeyAlias, previousKey, keyPassArray, null)
+
+        keystoreDate = LocalDateTime.now()
+        keystore.setKeyEntry(
+            DATE_ALIAS,
+            SecretKeySpec(keystoreDate.toString().toByteArray(), "HmacSHA256"),
+            null,
+            null
+        )
 
         logger.info("Secret key has been updated in keystore $keystorePath")
 
