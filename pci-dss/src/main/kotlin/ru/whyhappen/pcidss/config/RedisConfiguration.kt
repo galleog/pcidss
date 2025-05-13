@@ -8,7 +8,7 @@ import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.RedisSerializer
 
 /**
- * [Redis](https://redis.io/community-edition/) configuration.
+ * [Redis](https://redis.io/open-source/) configuration.
  */
 @Configuration(proxyBeanMethods = false)
 class RedisConfiguration {
