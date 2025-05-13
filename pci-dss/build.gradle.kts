@@ -23,6 +23,8 @@ dependencies {
     implementation(libs.bc.fips)
     implementation("io.lettuce:lettuce-core")
     implementation("org.apache.commons:commons-pool2")
+    implementation(libs.shedlock.spring)
+    implementation(libs.shedlock.provider)
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

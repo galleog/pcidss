@@ -8,6 +8,7 @@ kotest = "5.9.1"
 awaitility = "4.3.0"
 mockwebserver = "5.0.0-alpha.14"
 jsonpathkt = "3.0.2"
+shedlock = "6.6.0"
 
 [libraries]
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -20,6 +21,8 @@ kotest-bom = { group = "io.kotest", name = "kotest-bom", version.ref = "kotest" 
 awaitility-kotlin = { group = "org.awaitility", name = "awaitility-kotlin", version.ref = "awaitility" }
 mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
 jsonpathkt = { group = "com.eygraber", name = "jsonpathkt-kotlinx", version.ref = "jsonpathkt" }
+shedlock-spring = { group = "net.javacrumbs.shedlock", name = "shedlock-spring", version.ref = "shedlock" }
+shedlock-provider = { group = "net.javacrumbs.shedlock", name = "shedlock-provider-redis-spring", version.ref = "shedlock" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
