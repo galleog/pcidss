@@ -16,7 +16,7 @@ import org.springframework.core.annotation.Order
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.web.reactive.function.client.WebClient
 import ru.whyhappen.pcidss.iso8583.GeneralIsoMessageHandler
-import ru.whyhappen.pcidss.iso8583.IsoMessageCustomizer
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageCustomizer
 import ru.whyhappen.pcidss.iso8583.api.j8583.CurrentTimeTraceNumberGenerator
 import ru.whyhappen.pcidss.iso8583.api.j8583.config.JsonResourceMessageFactoryConfigurer
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.DefaultExceptionHandler

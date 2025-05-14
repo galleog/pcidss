@@ -21,6 +21,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
+import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageCustomizer
 import ru.whyhappen.pcidss.service.TokenService
 import kotlin.test.BeforeTest
 import kotlin.test.Test

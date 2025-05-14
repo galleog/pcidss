@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.iso8583
+package ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler
 
 import com.solab.iso8583.IsoMessage
 
