@@ -22,7 +22,7 @@ import javax.crypto.SecretKey
  * [KeystoreManager] that uses [Bouncy Castle FIPS](https://www.bouncycastle.org/download/bouncy-castle-java-fips/)
  * keystore to store secret keys.
  */
-class BcFipsKeystoreManager(
+open class BcFipsKeystoreManager(
     /**
      * Path to the keystore to save secret keys.
      */
@@ -46,9 +46,9 @@ class BcFipsKeystoreManager(
 ) : KeystoreManager, KeyRepository {
     override val keystoreFile: Path = Path.of(keystorePath)
     override lateinit var currentKey: Key
-        private set
+        protected set
     override var previousKey: Key? = null
-        private set
+        protected set
 
     private val keystoreExists: Boolean
         get() = Files.exists(keystoreFile)
