@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
-import ru.whyhappen.service.TokenService
+import ru.whyhappen.pcidss.service.TokenService
 
 /**
  * General message handler that works for almost all types of ISO8583 messages.

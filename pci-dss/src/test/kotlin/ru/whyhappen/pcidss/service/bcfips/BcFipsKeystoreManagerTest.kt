@@ -1,4 +1,4 @@
-package ru.whyhappen.service.bcfips
+package ru.whyhappen.pcidss.service.bcfips
 
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull

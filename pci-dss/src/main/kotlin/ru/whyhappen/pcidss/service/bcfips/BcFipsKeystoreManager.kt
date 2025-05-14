@@ -1,11 +1,11 @@
-package ru.whyhappen.service.bcfips
+package ru.whyhappen.pcidss.service.bcfips
 
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
-import ru.whyhappen.service.KeyRepository
-import ru.whyhappen.service.KeystoreManager
+import ru.whyhappen.pcidss.service.KeyRepository
+import ru.whyhappen.pcidss.service.KeystoreManager
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

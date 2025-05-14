@@ -1,4 +1,4 @@
-package ru.whyhappen.service.redis
+package ru.whyhappen.pcidss.service.redis
 
 import com.redis.testcontainers.RedisContainer
 import io.kotest.matchers.booleans.shouldBeFalse
@@ -24,8 +24,8 @@ import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import ru.whyhappen.pcidss.config.RedisConfiguration
-import ru.whyhappen.service.Encryptor
-import ru.whyhappen.service.KeyRepository
+import ru.whyhappen.pcidss.service.Encryptor
+import ru.whyhappen.pcidss.service.KeyRepository
 import javax.crypto.spec.SecretKeySpec
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi

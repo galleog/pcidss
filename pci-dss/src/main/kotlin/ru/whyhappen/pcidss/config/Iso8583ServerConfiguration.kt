@@ -26,11 +26,11 @@ import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.IdleEventHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ParseExceptionHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583ServerBootstrap
-import ru.whyhappen.service.Encryptor
-import ru.whyhappen.service.KeyRepository
-import ru.whyhappen.service.TokenService
-import ru.whyhappen.service.bcfips.BcFipsEncryptor
-import ru.whyhappen.service.redis.RedisTokenService
+import ru.whyhappen.pcidss.service.Encryptor
+import ru.whyhappen.pcidss.service.KeyRepository
+import ru.whyhappen.pcidss.service.TokenService
+import ru.whyhappen.pcidss.service.bcfips.BcFipsEncryptor
+import ru.whyhappen.pcidss.service.redis.RedisTokenService
 
 /**
  * Configuration for [Iso8583Server].
@@ -108,7 +108,7 @@ class Iso8583ServerConfiguration {
         redisTemplate: ReactiveRedisTemplate<ByteArray, String>,
         keyRepository: KeyRepository,
         encryptor: Encryptor
-    ) : TokenService = RedisTokenService(redisTemplate, keyRepository, encryptor)
+    ): TokenService = RedisTokenService(redisTemplate, keyRepository, encryptor)
 
     @Bean
     @Order(Ordered.LOWEST_PRECEDENCE)

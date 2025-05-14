@@ -1,4 +1,4 @@
-package ru.whyhappen.service
+package ru.whyhappen.pcidss.service
 
 /**
  * Interface to tokenize sensitive fields.

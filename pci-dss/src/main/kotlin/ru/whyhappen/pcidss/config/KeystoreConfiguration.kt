@@ -3,7 +3,7 @@ package ru.whyhappen.pcidss.config
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import ru.whyhappen.service.bcfips.BcFipsKeystoreManager
+import ru.whyhappen.pcidss.service.bcfips.BcFipsKeystoreManager
 
 /**
  * Configuration for the keystore for secret keys used to cipher sensitive data of ISO messages.

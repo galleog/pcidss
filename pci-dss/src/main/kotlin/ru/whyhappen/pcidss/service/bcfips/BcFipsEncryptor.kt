@@ -1,6 +1,6 @@
-package ru.whyhappen.service.bcfips
+package ru.whyhappen.pcidss.service.bcfips
 
-import ru.whyhappen.service.Encryptor
+import ru.whyhappen.pcidss.service.Encryptor
 import java.security.Key
 import javax.crypto.Mac
 
