@@ -26,5 +26,5 @@ data class KeystoreProperties(
     /**
      * Alias for the previous secret key.
      */
-    var previousKeyAlias: String = "previousKey",
+    var previousKeyAlias: String = "previousKey"
 )

@@ -1,7 +1,6 @@
 package ru.whyhappen.service.bcfips
 
 import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.date.shouldBeAfter
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
@@ -9,14 +8,12 @@ import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider
 import org.junit.jupiter.api.BeforeAll
-import ru.whyhappen.service.bcfips.BcFipsKeystoreManager.Companion.DATE_ALIAS
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption.*
 import java.security.Key
 import java.security.KeyStore
 import java.security.Security
-import java.time.LocalDateTime
 import javax.crypto.SecretKey
 import javax.crypto.spec.SecretKeySpec
 import kotlin.random.Random
@@ -33,7 +30,6 @@ class BcFipsKeystoreManagerTest {
     private val currentKeyAlias = "currentKey"
     private val previousKeyAlias = "previousKey"
     private lateinit var keystoreFile: Path
-    private val keystoreDate = LocalDateTime.now()
 
     companion object {
         @JvmStatic
@@ -65,7 +61,6 @@ class BcFipsKeystoreManagerTest {
         Files.exists(keystoreFile).shouldBeTrue()
         keystoreManager.currentKey.shouldBeInstanceOf<Key>()
         keystoreManager.previousKey.shouldBeNull()
-        keystoreManager.keystoreDate.shouldBeInstanceOf<LocalDateTime>()
     }
 
     @Test
@@ -79,7 +74,6 @@ class BcFipsKeystoreManagerTest {
 
         keystoreManager.currentKey shouldBe currentKey
         keystoreManager.previousKey shouldBe previousKey
-        keystoreManager.keystoreDate shouldBe keystoreDate
     }
 
     @Test
@@ -95,8 +89,11 @@ class BcFipsKeystoreManagerTest {
         keystoreManager.currentKey.shouldNotBeNull()
         keystoreManager.currentKey shouldNotBe currentKey
         keystoreManager.previousKey shouldBe currentKey
-        keystoreManager.keystoreDate.shouldBeInstanceOf<LocalDateTime>()
-        keystoreManager.keystoreDate shouldBeAfter keystoreDate
+
+        val oldKeystoreFile = keystoreFile.resolveSibling("${keystoreFile.fileName}.old")
+        Files.exists(oldKeystoreFile).shouldBeTrue()
+
+        oldKeystoreFile.toFile().deleteOnExit()
     }
 
     private fun keystoreManager(keystorePath: String) = BcFipsKeystoreManager(
@@ -117,13 +114,6 @@ class BcFipsKeystoreManagerTest {
         previousKey?.let {
             keystore.setKeyEntry(previousKeyAlias, it, keyPassArray, null)
         }
-
-        keystore.setKeyEntry(
-            DATE_ALIAS,
-            SecretKeySpec(keystoreDate.toString().toByteArray(), "HmacSHA256"),
-            null,
-            null
-        )
 
         Files.newOutputStream(keystoreFile, WRITE, CREATE, TRUNCATE_EXISTING).use {
             keystore.store(it, keystorePassword.toCharArray())

@@ -27,3 +27,6 @@ logging:
 
 antifraud:
   base-url: http://localhost:8081
+
+keystore:
+  update-cron: @yearly

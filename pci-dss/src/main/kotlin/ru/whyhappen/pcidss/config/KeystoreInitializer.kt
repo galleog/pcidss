@@ -29,8 +29,8 @@ class KeystoreInitializer(private val keystoreManager: KeystoreManager) : Comman
         }.onFailure { e ->
             val msg = when (e) {
                 is IOException -> {
-                    if (e.cause is UnrecoverableKeyException) "Password for keystore '${keystoreManager.keystorePath}' is invalid"
-                    else "Keystore '${keystoreManager.keystorePath}' can't be loaded"
+                    if (e.cause is UnrecoverableKeyException) "Password for keystore '${keystoreManager.keystoreFile}' is invalid"
+                    else "Keystore '${keystoreManager.keystoreFile}' can't be loaded"
                 }
 
                 is UnrecoverableKeyException -> "Key password is invalid"

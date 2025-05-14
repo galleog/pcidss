@@ -1,20 +1,22 @@
 package ru.whyhappen.service.bcfips
 
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.scheduling.annotation.Scheduled
 import ru.whyhappen.service.KeyRepository
 import ru.whyhappen.service.KeystoreManager
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption.ATOMIC_MOVE
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.nio.file.StandardOpenOption.*
 import java.security.GeneralSecurityException
 import java.security.Key
 import java.security.KeyStore
-import java.time.LocalDateTime
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
-import javax.crypto.spec.SecretKeySpec
 
 /**
  * [KeystoreManager] that uses [Bouncy Castle FIPS](https://www.bouncycastle.org/download/bouncy-castle-java-fips/)
@@ -42,20 +44,16 @@ class BcFipsKeystoreManager(
      */
     private val previousKeyAlias: String
 ) : KeystoreManager, KeyRepository {
-    override val keystorePath: Path = Path.of(keystorePath)
-    override lateinit var keystoreDate: LocalDateTime
-        private set
+    override val keystoreFile: Path = Path.of(keystorePath)
     override lateinit var currentKey: Key
         private set
     override var previousKey: Key? = null
         private set
 
     private val keystoreExists: Boolean
-        get() = Files.exists(keystorePath)
+        get() = Files.exists(keystoreFile)
 
     companion object {
-        internal const val DATE_ALIAS = "date"
-
         private val logger: Logger = LoggerFactory.getLogger(BcFipsKeystoreManager::class.java)
 
         private fun generateHmacKey(): SecretKey =
@@ -65,9 +63,6 @@ class BcFipsKeystoreManager(
             }
     }
 
-    /**
-     * Reads keys from the keystore or creates it if it doesn't exist.
-     */
     @Throws(
         IOException::class,
         GeneralSecurityException::class
@@ -79,15 +74,14 @@ class BcFipsKeystoreManager(
 
         if (keystoreExists) {
             // read keys from the keystore
-            Files.newInputStream(keystorePath, READ).use {
+            Files.newInputStream(keystoreFile, READ).use {
                 keystore.load(it, keystorePassArray)
             }
 
             currentKey = keystore.getKey(currentKeyAlias, keyPassArray)
             previousKey = keystore.getKey(previousKeyAlias, keyPassArray)
-            keystoreDate = LocalDateTime.parse(keystore.getKey(DATE_ALIAS, null).encoded.decodeToString())
 
-            logger.info("Keystore $keystorePath has been read")
+            logger.info("Keystore {} has been read", keystoreFile)
         } else {
             // create a new keystore
             keystore.load(null, null)
@@ -96,17 +90,9 @@ class BcFipsKeystoreManager(
             keystore.setKeyEntry(currentKeyAlias, currentKey, keyPassArray, null)
             keystore.getCreationDate(currentKeyAlias)
 
-            keystoreDate = LocalDateTime.now()
-            keystore.setKeyEntry(
-                DATE_ALIAS,
-                SecretKeySpec(keystoreDate.toString().toByteArray(), "HmacSHA256"),
-                null,
-                null
-            )
+            logger.info("New keystore {} has been created", keystoreFile)
 
-            logger.info("New keystore $keystorePath has been created")
-
-            Files.newOutputStream(keystorePath, WRITE, CREATE_NEW).use {
+            Files.newOutputStream(keystoreFile, WRITE, CREATE_NEW).use {
                 keystore.store(it, keystorePassArray)
             }
         }
@@ -115,12 +101,14 @@ class BcFipsKeystoreManager(
     /**
      * Changes the secret key used to hash ISO8583 secret fields and saves the previous key with another alias.
      */
+    @Scheduled(cron = "\${keystore.update-cron:@yearly}")
+    @SchedulerLock(name = "updateSecretKey", lockAtMostFor = "PT1H", lockAtLeastFor = "PT1H")
     @Throws(
         IOException::class,
         GeneralSecurityException::class
     )
-    override fun updateSecretKey() {
-        require(keystoreExists) { "Keystore $keystorePath doesn't exist" }
+    fun updateSecretKey() {
+        require(keystoreExists) { "Keystore $keystoreFile doesn't exist" }
 
         val keystore = KeyStore.getInstance("BCFKS", "BCFIPS")
         val keystorePassArray = keystorePassword.toCharArray()
@@ -129,23 +117,28 @@ class BcFipsKeystoreManager(
         keystore.load(null, null)
 
         // generate a new key and store the previous one under the previous key alias
-        previousKey = currentKey
-        currentKey = generateHmacKey()
-        keystore.setKeyEntry(currentKeyAlias, currentKey, keyPassArray, null)
-        keystore.setKeyEntry(previousKeyAlias, previousKey, keyPassArray, null)
+        val newKey = generateHmacKey()
+        keystore.setKeyEntry(currentKeyAlias, newKey, keyPassArray, null)
+        keystore.setKeyEntry(previousKeyAlias, currentKey, keyPassArray, null)
 
-        keystoreDate = LocalDateTime.now()
-        keystore.setKeyEntry(
-            DATE_ALIAS,
-            SecretKeySpec(keystoreDate.toString().toByteArray(), "HmacSHA256"),
-            null,
-            null
-        )
+        // save old keystore
+        val oldKeystoreFile = keystoreFile.resolveSibling("${keystoreFile.fileName}.old")
+        Files.move(keystoreFile, oldKeystoreFile, ATOMIC_MOVE, REPLACE_EXISTING)
 
-        logger.info("Secret key has been updated in keystore $keystorePath")
+        runCatching {
+            Files.newOutputStream(keystoreFile, WRITE, CREATE_NEW).use {
+                keystore.store(it, keystorePassArray)
+            }
+        }.onSuccess {
+            previousKey = currentKey
+            currentKey = newKey
 
-        Files.newOutputStream(keystorePath, WRITE, TRUNCATE_EXISTING).use {
-            keystore.store(it, keystorePassArray)
+            logger.info("Secret key has been updated in keystore {}", keystoreFile)
+        }.onFailure { e ->
+            logger.error("Failed to update secret key in keystore {}", keystoreFile, e)
+
+            // restore keystore
+            Files.move(oldKeystoreFile, keystoreFile, ATOMIC_MOVE)
         }
     }
 }
