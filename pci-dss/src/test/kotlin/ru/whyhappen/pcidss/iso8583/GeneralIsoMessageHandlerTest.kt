@@ -67,10 +67,8 @@ class GeneralIsoMessageHandlerTest {
     @Test
     fun `should tokenize fields and update fields set by the external service`() = runTest {
         val mockResponse = """{
-                "fields": {
-                    "2": "token1",
-                    "39": "01"
-                }
+                "2": "token1",
+                "39": "01"
             }""".trimIndent()
 
         mockWebServer.enqueue(
@@ -112,12 +110,12 @@ class GeneralIsoMessageHandlerTest {
         recordedRequest.method shouldBe "POST"
 
         with(Json.parseToJsonElement(recordedRequest.body.readUtf8())) {
-            resolvePathAsStringOrNull("$.mti") shouldBe "%04x".format(inboundMessage.type)
-            resolvePathAsStringOrNull("$.fields.2") shouldBe "token1"
-            resolvePathAsStringOrNull("$.fields.32") shouldBe inboundMessage.getObjectValue(32)
-            resolvePathAsStringOrNull("$.fields.35") shouldBe "token2"
-            resolvePathAsStringOrNull("$.fields.60") shouldBe inboundMessage.getObjectValue(60)
-            resolvePathAsStringOrNull("$.fields.61") shouldBe inboundMessage.getObjectValue(61)
+            resolvePathAsStringOrNull("$.0") shouldBe "%04x".format(inboundMessage.type)
+            resolvePathAsStringOrNull("$.2") shouldBe "token1"
+            resolvePathAsStringOrNull("$.32") shouldBe inboundMessage.getObjectValue(32)
+            resolvePathAsStringOrNull("$.35") shouldBe "token2"
+            resolvePathAsStringOrNull("$.60") shouldBe inboundMessage.getObjectValue(60)
+            resolvePathAsStringOrNull("$.61") shouldBe inboundMessage.getObjectValue(61)
         }
 
         with(result) {
