@@ -13,7 +13,7 @@ import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.web.reactive.function.client.WebClient
-import ru.whyhappen.pcidss.core.iso8583.GeneralIsoMessageHandler
+import ru.whyhappen.pcidss.core.iso8583.ExternalIsoMessageHandler
 import ru.whyhappen.pcidss.core.service.Encryptor
 import ru.whyhappen.pcidss.core.service.KeyRepository
 import ru.whyhappen.pcidss.core.service.TokenService
@@ -76,7 +76,7 @@ class Iso8583Configuration {
         webClient: WebClient,
         customizer: ObjectProvider<IsoMessageCustomizer>
     ): IsoMessageHandler {
-        return GeneralIsoMessageHandler(
+        return ExternalIsoMessageHandler(
             properties.message.sensitiveDataFields,
             messageFactory,
             tokenService,
