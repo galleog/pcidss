@@ -25,7 +25,6 @@ import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.IdleEventHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ParseExceptionHandler
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583ServerBootstrap
 import ru.whyhappen.pcidss.service.Encryptor
 import ru.whyhappen.pcidss.service.KeyRepository
 import ru.whyhappen.pcidss.service.TokenService
