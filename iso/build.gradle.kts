@@ -6,5 +6,6 @@ dependencies {
     implementation(platform(libs.spring.boot.bom))
 
     api(project(":iso8583-api"))
+    api(project(":pcidss-core"))
     api("org.springframework.boot:spring-boot-autoconfigure")
 }

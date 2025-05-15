@@ -12,6 +12,7 @@ dependencies {
         exclude("io.netty")
     }
     api("io.projectreactor.netty:reactor-netty-core")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     api("io.projectreactor.kotlin:reactor-kotlin-extensions")
     api("io.micrometer:micrometer-observation")
