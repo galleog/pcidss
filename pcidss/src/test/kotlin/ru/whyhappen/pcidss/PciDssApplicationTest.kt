@@ -15,11 +15,6 @@ class PciDssApplicationTest {
     @Autowired
     private lateinit var server: Iso8583Server
 
-    @Test
-    fun `iso8583 server is running and properly configured`() {
-        server.isStarted shouldBe true
-    }
-
     companion object {
         @JvmStatic
         @DynamicPropertySource
@@ -28,5 +23,10 @@ class PciDssApplicationTest {
                 System.getProperty("java.io.tmpdir") + "/keystore.bcfks"
             }
         }
+    }
+
+    @Test
+    fun `iso8583 server is running and properly configured`() {
+        server.isStarted shouldBe true
     }
 }

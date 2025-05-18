@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import ru.whyhappen.pcidss.core.service.KeystoreManager
+import ru.whyhappen.pcidss.service.KeystoreManager
 import java.io.IOException
 import java.security.Security
 import java.security.UnrecoverableKeyException

@@ -65,10 +65,10 @@ class DefaultTcpTestHelper : TcpTestHelper {
             .build()
         return Iso8583Server(
             port,
-            observationRegistry,
             config,
             messageFactory,
-            listOf(isoMessageHandler)
+            listOf(isoMessageHandler),
+            observationRegistry
         )
     }
 

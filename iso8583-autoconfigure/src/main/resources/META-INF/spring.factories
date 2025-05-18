@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  ru.whyhappen.pcidss.iso8583.autoconfigure.Iso8583AutoConfiguration

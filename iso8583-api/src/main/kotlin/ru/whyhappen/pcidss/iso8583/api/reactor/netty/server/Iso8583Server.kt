@@ -21,10 +21,10 @@ import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ParseExceptionHand
  */
 class Iso8583Server(
     val port: Int,
-    private val observationRegistry: ObservationRegistry,
     private val configuration: ServerConfiguration,
     private val isoMessageFactory: MessageFactory<IsoMessage>,
     messageHandlers: List<IsoMessageHandler>,
+    private val observationRegistry: ObservationRegistry,
     exceptionHandler: ExceptionHandler = DefaultExceptionHandler(isoMessageFactory),
     private val parseExceptionHandler: ChannelHandler = ParseExceptionHandler(isoMessageFactory),
     private val idleEventHandler: ChannelHandler = IdleEventHandler(isoMessageFactory)

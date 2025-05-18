@@ -6,17 +6,19 @@ dependencies {
     implementation(platform(libs.spring.boot.bom))
     implementation(platform(libs.kotest.bom))
 
-    api("org.springframework:spring-context")
-    api("com.fasterxml.jackson.module:jackson-module-kotlin")
     api(libs.jreactive8583) {
         exclude("io.netty")
     }
-    api("io.projectreactor.netty:reactor-netty-core")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-    api("io.projectreactor.kotlin:reactor-kotlin-extensions")
-    api("io.micrometer:micrometer-observation")
-    api("io.micrometer:micrometer-tracing")
+    api("io.netty:netty-handler")
+
+    implementation("org.springframework:spring-context")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("io.projectreactor.netty:reactor-netty-core")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+    implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+    implementation("io.micrometer:micrometer-observation")
+    implementation("io.micrometer:micrometer-tracing")
 
     testImplementation("org.springframework:spring-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
