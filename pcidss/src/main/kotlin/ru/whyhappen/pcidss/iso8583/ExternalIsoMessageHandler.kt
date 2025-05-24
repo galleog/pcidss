@@ -2,11 +2,11 @@ package ru.whyhappen.pcidss.iso8583
 
 import com.github.kpavlov.jreactive8583.iso.MessageFactory
 import com.solab.iso8583.IsoMessage
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.awaitBody
 import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
 import ru.whyhappen.pcidss.service.TokenService
 
@@ -45,12 +45,19 @@ class ExternalIsoMessageHandler(
 
     override suspend fun onMessage(inbound: IsoMessage): IsoMessage = coroutineScope {
         // get tokens for all sensitive fields
-        val tokens: Map<Int, String> = sensitiveDataFields.asSequence()
-            .filter(inbound::hasField)
-            .associateWith {
-                val value = inbound.getAt<Any>(it).toString()
-                tokenService.getToken(value)
-            }
+        val deferredEntries: List<Pair<Int, Deferred<String>>> = withContext(Dispatchers.IO) {
+            sensitiveDataFields.asSequence()
+                .filter(inbound::hasField)
+                .map {
+                    val value = inbound.getAt<Any>(it).toString()
+                    it to async { tokenService.getToken(value) }
+                }.toList()
+        }
+
+        val results = deferredEntries.map { it.second }.awaitAll()
+        val tokens = deferredEntries.map { it.first }
+            .zip(results)
+            .toMap()
 
         // send the incoming message to the external service
         val reqBody = IsoMessageDto(
@@ -63,8 +70,7 @@ class ExternalIsoMessageHandler(
             .accept(MediaType.APPLICATION_JSON)
             .bodyValue(reqBody)
             .retrieve()
-            .bodyToMono(IsoMessageDto::class.java)
-            .awaitSingle()
+            .awaitBody<IsoMessageDto>()
 
         messageFactory.createResponse(inbound)
             .apply {
