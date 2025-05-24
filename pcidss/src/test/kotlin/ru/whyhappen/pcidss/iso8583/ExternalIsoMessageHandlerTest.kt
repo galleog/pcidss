@@ -104,7 +104,17 @@ class ExternalIsoMessageHandlerTest {
         every { messageFactory.createResponse(inboundMessage) } returns responseMessage
 
         handler = ExternalIsoMessageHandler(listOf(2, 35), messageFactory, tokenService, webClient, customizer)
-        val result = handler.onMessage(inboundMessage)
+
+        with(handler.onMessage(inboundMessage)) {
+            type shouldBe 0x210
+            getObjectValue<String>(2) shouldBe inboundMessage.getObjectValue(2)
+            getObjectValue<String>(32) shouldBe inboundMessage.getObjectValue(32)
+            getObjectValue<String>(35) shouldBe inboundMessage.getObjectValue(35)
+            getObjectValue<String>(39) shouldBe "01"
+            getObjectValue<String>(60) shouldBe responseMessage.getObjectValue(60)
+            getObjectValue<String>(61) shouldBe inboundMessage.getObjectValue(61)
+            getObjectValue<String>(70) shouldBe responseMessage.getObjectValue(70)
+        }
 
         val recordedRequest = mockWebServer.takeRequest()
         recordedRequest.method shouldBe "POST"
@@ -116,17 +126,6 @@ class ExternalIsoMessageHandlerTest {
             resolvePathAsStringOrNull("$.35") shouldBe "token2"
             resolvePathAsStringOrNull("$.60") shouldBe inboundMessage.getObjectValue(60)
             resolvePathAsStringOrNull("$.61") shouldBe inboundMessage.getObjectValue(61)
-        }
-
-        with(result) {
-            type shouldBe 0x210
-            getObjectValue<String>(2) shouldBe inboundMessage.getObjectValue(2)
-            getObjectValue<String>(32) shouldBe inboundMessage.getObjectValue(32)
-            getObjectValue<String>(35) shouldBe inboundMessage.getObjectValue(35)
-            getObjectValue<String>(39) shouldBe "01"
-            getObjectValue<String>(60) shouldBe responseMessage.getObjectValue(60)
-            getObjectValue<String>(61) shouldBe inboundMessage.getObjectValue(61)
-            getObjectValue<String>(70) shouldBe responseMessage.getObjectValue(70)
         }
 
         coVerifyAll {

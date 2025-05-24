@@ -43,36 +43,37 @@ class ExternalIsoMessageHandler(
 
     override fun supports(isoMessage: IsoMessage): Boolean = true
 
-    override suspend fun onMessage(inbound: IsoMessage): IsoMessage = coroutineScope {
-        // get tokens for all sensitive fields
-        val deferredEntries: List<Pair<Int, Deferred<String>>> = withContext(Dispatchers.IO) {
-            sensitiveDataFields.asSequence()
+    override suspend fun onMessage(inbound: IsoMessage): IsoMessage {
+        val respBody = withContext(Dispatchers.IO) {
+            // get tokens for all sensitive fields
+            val deferredEntries: List<Pair<Int, Deferred<String>>> = sensitiveDataFields
+                .asSequence()
                 .filter(inbound::hasField)
                 .map {
                     val value = inbound.getAt<Any>(it).toString()
                     it to async { tokenService.getToken(value) }
                 }.toList()
+
+            val results = deferredEntries.map { it.second }.awaitAll()
+            val tokens = deferredEntries.map { it.first }
+                .zip(results)
+                .toMap()
+
+            // send the incoming message to the external service
+            val reqBody = IsoMessageDto(
+                inbound.type,
+                (2..128).asSequence()
+                    .filter(inbound::hasField)
+                    .associateWith { tokens[it] ?: inbound.getAt<Any>(it).toString() }
+            )
+            webClient.post()
+                .accept(MediaType.APPLICATION_JSON)
+                .bodyValue(reqBody)
+                .retrieve()
+                .awaitBody<IsoMessageDto>()
         }
 
-        val results = deferredEntries.map { it.second }.awaitAll()
-        val tokens = deferredEntries.map { it.first }
-            .zip(results)
-            .toMap()
-
-        // send the incoming message to the external service
-        val reqBody = IsoMessageDto(
-            inbound.type,
-            (2..128).asSequence()
-                .filter(inbound::hasField)
-                .associateWith { tokens[it] ?: inbound.getAt<Any>(it).toString() }
-        )
-        val respBody = webClient.post()
-            .accept(MediaType.APPLICATION_JSON)
-            .bodyValue(reqBody)
-            .retrieve()
-            .awaitBody<IsoMessageDto>()
-
-        messageFactory.createResponse(inbound)
+        return messageFactory.createResponse(inbound)
             .apply {
                 // copy fields to the response message
                 for ((key, value) in respBody.fields) {
