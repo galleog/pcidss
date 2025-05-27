@@ -35,9 +35,8 @@ class Iso8583AutoConfiguration {
     ): MessageFactory<IsoMessage> {
         val configurer = JsonResourceMessageFactoryConfigurer(
             objectMapper.ifAvailable ?: jacksonObjectMapper(),
-            properties.message.configs,
-            { type -> IsoMessage().apply { this.type = type } }
-        )
+            properties.message.configs
+        ) { type -> IsoMessage().apply { this.type = type } }
 
         val messageFactory = LooseMessageFactory<IsoMessage>()
             .apply {

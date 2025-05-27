@@ -1,0 +1,42 @@
+{
+  "headers": [
+    {
+      "type": "0200",
+      "value": "ISO015000050"
+    }
+  ],
+  "templates": [
+    {
+      "type": "0800",
+      "fields": [
+        {
+          "num": 70,
+          "type": "NUMERIC",
+          "length": 3,
+          "value": "301"
+        }
+      ]
+    }
+  ],
+  "parses": [
+    {
+      "type": "0800",
+      "fields": [
+        {
+          "num": 7,
+          "type": "DATE10"
+        },
+        {
+          "num": 11,
+          "type": "NUMERIC",
+          "length": 6
+        },
+        {
+          "num": 70,
+          "type": "NUMERIC",
+          "length": 3
+        }
+      ]
+    }
+  ]
+}
