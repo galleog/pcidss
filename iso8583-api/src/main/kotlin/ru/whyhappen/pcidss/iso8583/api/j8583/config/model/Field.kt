@@ -16,18 +16,18 @@ data class Field(
     val type: String,
     /**
      * Length of the field. Only ALPHA and NUMERIC types need to have a length specified.
-     * The other types either have a fixed length, or have their length specified as part of
+     * The other types either have a fixed length or have their length specified as part of
      * the field (LLVAR and LLLVAR).
      */
-    val length: Int?,
+    val length: Int? = null,
     /**
      * Timezone useful for date fields.
      */
-    val tz: String?,
+    val tz: String? = null,
     /**
      * Default value of the field when creating messages.
      */
-    val value: String?,
+    val value: String? = null,
     /**
      * Subfields if the field acts as a container for several ISO values.
      */

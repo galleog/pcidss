@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import ru.whyhappen.pcidss.iso8583.api.j8583.CurrentTimeTraceNumberGenerator
+import ru.whyhappen.pcidss.iso8583.api.j8583.LooseMessageFactory
 import ru.whyhappen.pcidss.iso8583.api.j8583.config.JsonResourceMessageFactoryConfigurer
 import ru.whyhappen.pcidss.iso8583.autoconfigure.server.Iso8583ServerConfiguration
 
@@ -32,10 +33,14 @@ class Iso8583AutoConfiguration {
         objectMapper: ObjectProvider<ObjectMapper>,
         traceNumberGenerator: ObjectProvider<TraceNumberGenerator>
     ): MessageFactory<IsoMessage> {
-        val messageFactory = JsonResourceMessageFactoryConfigurer<IsoMessage>(
+        val configurer = object : JsonResourceMessageFactoryConfigurer<IsoMessage>(
             objectMapper.ifAvailable ?: jacksonObjectMapper(),
             properties.message.configs
-        ).createMessageFactory()
+        ) {
+            override fun createIsoMessage(type: Int) = IsoMessage().apply { this.type = type }
+        }
+
+        val messageFactory = LooseMessageFactory<IsoMessage>()
             .apply {
                 // set message factory properties
                 this.traceNumberGenerator = traceNumberGenerator.ifAvailable ?: CurrentTimeTraceNumberGenerator()
@@ -51,7 +56,10 @@ class Iso8583AutoConfiguration {
                 isVariableLengthFieldsInHex = properties.message.variableLengthFieldsInHex
                 characterEncoding = properties.message.characterEncoding
                 isUseDateTimeApi = true
+
+                configurer.configure(this)
             }
+
         return J8583MessageFactory(messageFactory, properties.message.isoVersion, properties.message.role)
     }
 }

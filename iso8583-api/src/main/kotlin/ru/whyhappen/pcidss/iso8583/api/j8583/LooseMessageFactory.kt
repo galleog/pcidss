@@ -20,9 +20,10 @@ class LooseMessageFactory<T : IsoMessage> : MessageFactory<T>() {
         }
 
         val m: T = if (binaryIsoHeader && isoHeaderLength > 0) {
-            val _bih = ByteArray(isoHeaderLength)
-            System.arraycopy(buf, 0, _bih, 0, isoHeaderLength)
-            createIsoMessageWithBinaryHeader(_bih)
+            ByteArray(isoHeaderLength).run {
+                System.arraycopy(buf, 0, this, 0, isoHeaderLength)
+                createIsoMessageWithBinaryHeader(this)
+            }
         } else {
             createIsoMessage(
                 if (isoHeaderLength > 0) String(buf, 0, isoHeaderLength, charset(characterEncoding))
@@ -79,15 +80,17 @@ class LooseMessageFactory<T : IsoMessage> : MessageFactory<T>() {
             }
         } else {
             // ASCII parsing
-            try {
-                val bitmapBuffer: ByteArray
-                if (isForceStringEncoding) {
-                    val _bb = String(buf, isoHeaderLength + 4, 16, charset(characterEncoding)).toByteArray()
-                    bitmapBuffer = ByteArray(36 + isoHeaderLength)
-                    System.arraycopy(_bb, 0, bitmapBuffer, 4 + isoHeaderLength, 16)
-                } else {
-                    bitmapBuffer = buf
-                }
+            runCatching {
+                val bitmapBuffer = if (isForceStringEncoding) {
+                    ByteArray(36 + isoHeaderLength).also {
+                        System.arraycopy(
+                            String(buf, isoHeaderLength + 4, 16, charset(characterEncoding)).toByteArray(),
+                            0,
+                            it,
+                            4 + isoHeaderLength, 16
+                        )
+                    }
+                } else buf
 
                 for (i in isoHeaderLength + 4 until isoHeaderLength + 20) {
                     when {
@@ -121,9 +124,15 @@ class LooseMessageFactory<T : IsoMessage> : MessageFactory<T>() {
                     }
 
                     if (isForceStringEncoding) {
-                        val _bb = String(buf, isoHeaderLength + 20, 16, charset(characterEncoding)).toByteArray()
-                        System.arraycopy(_bb, 0, bitmapBuffer, 20 + isoHeaderLength, 16)
+                        System.arraycopy(
+                            String(buf, isoHeaderLength + 20, 16, charset(characterEncoding)).toByteArray(),
+                            0,
+                            bitmapBuffer,
+                            20 + isoHeaderLength,
+                            16
+                        )
                     }
+
                     for (i in isoHeaderLength + 20 until isoHeaderLength + 36) {
                         when {
                             bitmapBuffer[i] >= '0'.code.toByte() && bitmapBuffer[i] <= '9'.code.toByte() -> {
@@ -152,10 +161,11 @@ class LooseMessageFactory<T : IsoMessage> : MessageFactory<T>() {
                 } else {
                     pos = minLength
                 }
-            } catch (ex: NumberFormatException) {
-                val _e = ParseException("Invalid ISO8583 bitmap", pos)
-                _e.initCause(ex)
-                throw _e
+            }.onFailure { e ->
+                throw when(e) {
+                    is NumberFormatException -> ParseException("Invalid ISO8583 bitmap", pos).apply { initCause(e) }
+                    else -> e
+                }
             }
         }
 
@@ -170,7 +180,7 @@ class LooseMessageFactory<T : IsoMessage> : MessageFactory<T>() {
         }
 
         // first we check if the message contains fields not specified in the parsing template
-        for (i in 1..<bs.length()) {
+        for (i in 1 until bs.length()) {
             if (bs[i] && !index.contains(i + 1)) {
                 log.warn(
                     "ISO8583 MessageFactory cannot parse field {}: unspecified in parsing guide for type 0x{}",

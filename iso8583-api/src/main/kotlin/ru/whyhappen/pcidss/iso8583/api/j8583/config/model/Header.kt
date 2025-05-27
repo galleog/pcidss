@@ -11,13 +11,13 @@ data class Header(
     /**
      * ISO type for another header that has the same value. That header can be in another configuration file
      */
-    val ref: String?,
+    val ref: String? = null,
     /**
      * Indicates if the header is binary.
      */
-    val binary: Boolean?,
+    val binary: Boolean? = null,
     /**
-     * Header's value. Can be omitted if the header isn't needed
+     * Header's value. Can be omitted if the header refers to another one.
      */
     val value: String?
 )

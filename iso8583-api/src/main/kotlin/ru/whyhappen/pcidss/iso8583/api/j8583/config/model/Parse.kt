@@ -14,7 +14,7 @@ data class Parse(
      * It can refer to the same template in another configuration file or
      * be 'untyped' if this template extends a one without any type.
      */
-    val extends: String?,
+    val extends: String? = null,
     /**
      * Fields incoming messages of this type contain.
      */

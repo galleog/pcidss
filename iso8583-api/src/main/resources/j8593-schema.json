@@ -65,8 +65,15 @@
           "$ref": "#/$defs/isoType"
         },
         "extends": {
-          "description": "ISO type for an existing template this one extends. It can refer to the same template in another configuration file",
-          "$ref": "#/$defs/isoType"
+          "description": "ISO type for an existing template this one extends. It can refer to the same template in another configuration file or be 'untyped' if this template extends a one without any type",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/isoType"
+            },
+            {
+              "enum": ["untyped"]
+            }
+          ]
         },
         "fields": {
           "description": "Fields new messages of this type contain",
@@ -74,7 +81,6 @@
           "items": { "$ref": "#/$defs/field" }
         }
       },
-      "required": ["type"],
       "additionalProperties": false
     },
 
