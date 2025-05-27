@@ -8,11 +8,6 @@ import com.solab.iso8583.MessageFactory
  */
 interface MessageFactoryConfigurer<T : IsoMessage> {
     /**
-     * Creates a new ISO message of the specified type.
-     */
-    fun createIsoMessage(type: Int): T
-
-    /**
      * Configures an existing message factory.
      */
     fun configure(messageFactory: MessageFactory<T>)

@@ -1226,11 +1226,8 @@ class AbstractMessageFactoryConfigurerTest {
 
 }
 
-class TestConfigurer(val config: Iso8583Config) : AbstractMessageFactoryConfigurer<IsoMessage>() {
-    override fun createIsoMessage(type: Int) = IsoMessage().apply {
-        this.type = type
-    }
-
+class TestConfigurer(val config: Iso8583Config) :
+    AbstractMessageFactoryConfigurer<IsoMessage>({ type -> IsoMessage().apply { this.type = type } }) {
     override fun configure(messageFactory: MessageFactory<IsoMessage>) {
         applyConfigs(messageFactory, listOf(config))
     }

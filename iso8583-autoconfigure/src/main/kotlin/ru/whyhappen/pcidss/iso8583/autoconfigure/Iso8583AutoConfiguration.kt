@@ -33,12 +33,11 @@ class Iso8583AutoConfiguration {
         objectMapper: ObjectProvider<ObjectMapper>,
         traceNumberGenerator: ObjectProvider<TraceNumberGenerator>
     ): MessageFactory<IsoMessage> {
-        val configurer = object : JsonResourceMessageFactoryConfigurer<IsoMessage>(
+        val configurer = JsonResourceMessageFactoryConfigurer(
             objectMapper.ifAvailable ?: jacksonObjectMapper(),
-            properties.message.configs
-        ) {
-            override fun createIsoMessage(type: Int) = IsoMessage().apply { this.type = type }
-        }
+            properties.message.configs,
+            { type -> IsoMessage().apply { this.type = type } }
+        )
 
         val messageFactory = LooseMessageFactory<IsoMessage>()
             .apply {

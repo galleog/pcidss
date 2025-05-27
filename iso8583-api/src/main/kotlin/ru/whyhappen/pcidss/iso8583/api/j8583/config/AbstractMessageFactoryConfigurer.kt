@@ -18,7 +18,9 @@ import java.util.regex.Pattern
 /**
  * Abstract base implementation of [MessageFactoryConfigurer].
  */
-abstract class AbstractMessageFactoryConfigurer<T : IsoMessage> : MessageFactoryConfigurer<T> {
+abstract class AbstractMessageFactoryConfigurer<T : IsoMessage>(
+    private val messageCreator: (Int) -> T,
+) : MessageFactoryConfigurer<T> {
     companion object {
         private const val UNTYPED = "untyped"
         private const val EXCLUDE = "exclude"
@@ -101,7 +103,7 @@ abstract class AbstractMessageFactoryConfigurer<T : IsoMessage> : MessageFactory
 
             when {
                 template.extends.isNullOrEmpty() -> {
-                    val message = createIsoMessage(type).apply {
+                    val message = messageCreator(type).apply {
                         characterEncoding = messageFactory.characterEncoding
 
                         for (field in template.fields) {
@@ -127,7 +129,7 @@ abstract class AbstractMessageFactoryConfigurer<T : IsoMessage> : MessageFactory
                 "Template ${template.type} extends nonexistent template ${template.extends}"
             )
 
-            val message = createIsoMessage(type).apply {
+            val message = messageCreator(type).apply {
                 characterEncoding = messageFactory.characterEncoding
             }
 

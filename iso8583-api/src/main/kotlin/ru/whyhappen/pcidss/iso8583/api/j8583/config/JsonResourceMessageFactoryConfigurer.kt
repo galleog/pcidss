@@ -9,10 +9,11 @@ import ru.whyhappen.pcidss.iso8583.api.j8583.config.model.Iso8583Config
 /**
  * Implementation of [MessageFactoryConfigurer] that uses JSON resources for configuration.
  */
-abstract class JsonResourceMessageFactoryConfigurer<T: IsoMessage>(
+class JsonResourceMessageFactoryConfigurer<T : IsoMessage>(
     private val objectMapper: ObjectMapper,
-    private val resources: List<Resource>
-) : AbstractMessageFactoryConfigurer<T>() {
+    private val resources: List<Resource>,
+    messageCreator: (Int) -> T
+) : AbstractMessageFactoryConfigurer<T>(messageCreator) {
     override fun configure(messageFactory: MessageFactory<T>) {
         applyConfigs(messageFactory, resources.map { resource ->
             resource.inputStream.use {
