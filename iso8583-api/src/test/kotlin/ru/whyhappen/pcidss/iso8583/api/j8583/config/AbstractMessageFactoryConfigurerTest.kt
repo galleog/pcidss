@@ -45,7 +45,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should configure headers`() {
+    fun `should configure message factory to apply headers`() {
         val config = Iso8583Config(
             headers = listOf(
                 Header("0200", null, null, "ISO015000050"),
@@ -58,16 +58,40 @@ class AbstractMessageFactoryConfigurerTest {
 
         TestConfigurer(config).configure(messageFactory)
         with(messageFactory) {
-            getIsoHeader(0x200) shouldBe config.headers[0].value
-            getIsoHeader(0x400) shouldBe config.headers[0].value
-            getIsoHeader(0x800) shouldBe config.headers[2].value
-            getIsoHeader(0x0810) shouldBe config.headers[2].value
+            getIsoHeader(0x200) shouldBe "ISO015000050"
+            getIsoHeader(0x400) shouldBe "ISO015000050"
+            getIsoHeader(0x800) shouldBe "ISO015000015"
+            getIsoHeader(0x0810) shouldBe "ISO015000015"
             getIsoHeader(0x0280).shouldBeNull()
             getBinaryIsoHeader(0x200).shouldBeNull()
             getBinaryIsoHeader(0x400).shouldBeNull()
             getBinaryIsoHeader(0x800).shouldBeNull()
             getBinaryIsoHeader(0x0810).shouldBeNull()
-            getBinaryIsoHeader(0x0280) shouldBe HexCodec.hexDecode(config.headers[4].value)
+            getBinaryIsoHeader(0x0280) shouldBe HexCodec.hexDecode("ffffffff")
+        }
+    }
+
+    @Test
+    fun `should configure message factory to apply headers from different configs`() {
+        val configs = listOf(
+            Iso8583Config(
+                headers = listOf(
+                    Header("0200", null, null, "ISO015000050"),
+                    Header("800", null, false, "ISO015000015")
+                )
+            ),
+            Iso8583Config(
+                headers = listOf(
+                    Header("400", "200", null, null)
+                )
+            )
+        )
+
+        TestConfigurer(configs).configure(messageFactory)
+        with(messageFactory) {
+            getIsoHeader(0x200) shouldBe "ISO015000050"
+            getIsoHeader(0x400) shouldBe "ISO015000050"
+            getIsoHeader(0x800) shouldBe "ISO015000015"
         }
     }
 
@@ -99,7 +123,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should configure templates`() {
+    fun `should configure templates for the message factory`() {
         val config = Iso8583Config(
             templates = listOf(
                 Template(
@@ -120,7 +144,7 @@ class AbstractMessageFactoryConfigurerTest {
                 Template(
                     "400", "0200", listOf(
                         Field(90, "ALPHA", 42, null, "BLA"),
-                        Field(102, "exclude", null, null, null)
+                        Field(102, "exclude")
                     )
                 )
             )
@@ -147,6 +171,60 @@ class AbstractMessageFactoryConfigurerTest {
             43 to IsoValue(IsoType.ALPHA, "TEST1", 5),
             60 to IsoValue(IsoType.LLLVAR, "B456PRO1+000"),
             90 to IsoValue(IsoType.ALPHA, "BLA", 42),
+        )
+    }
+
+    @Test
+    fun `should configure templates from different configs`() {
+        val configs = listOf(
+            Iso8583Config(
+                templates = listOf(
+                    Template(
+                        null, null, listOf(
+                            Field(39, "NUMERIC", 2, null, "01")
+                        )
+                    ),
+                    Template(
+                        "200", null, listOf(
+                            Field(3, "NUMERIC", 6, null, "65000"),
+                            Field(102, "LLVAR", null, null, "ABCD")
+                        )
+                    )
+                )
+            ),
+            Iso8583Config(
+                templates = listOf(
+                    Template(
+                        "0210", "untyped", listOf(
+                            Field(32, "LLVAR", null, null, "456")
+                        )
+                    ),
+                    Template(
+                        "400", "0200", listOf(
+                            Field(90, "ALPHA", 42, null, "BLA"),
+                            Field(102, "exclude")
+                        )
+                    )
+                )
+            )
+        )
+
+        TestConfigurer(configs).configure(messageFactory)
+
+        messageFactory.getMessageTemplate(-1) shouldMatchFields mapOf(
+            39 to IsoValue(IsoType.NUMERIC, "01", 2)
+        )
+        messageFactory.getMessageTemplate(0x0200) shouldMatchFields mapOf(
+            3 to IsoValue(IsoType.NUMERIC, "65000", 6),
+            102 to IsoValue(IsoType.LLVAR, "ABCD")
+        )
+        messageFactory.getMessageTemplate(0x0210) shouldMatchFields mapOf(
+            32 to IsoValue(IsoType.LLVAR, "456"),
+            39 to IsoValue(IsoType.NUMERIC, "01", 2)
+        )
+        messageFactory.getMessageTemplate(0x0400) shouldMatchFields mapOf(
+            3 to IsoValue(IsoType.NUMERIC, "65000", 6),
+            90 to IsoValue(IsoType.ALPHA, "BLA", 42)
         )
     }
 
@@ -369,7 +447,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should configure a template with DateTime API`() {
+    fun `should configure a template with temporals`() {
         val config = Iso8583Config(
             templates = listOf(
                 Template(
@@ -458,7 +536,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should apply data to parse messages`() {
+    fun `should configure message factory to parse messages`() {
         val config = Iso8583Config(
             parses = listOf(
                 Parse(
@@ -650,7 +728,67 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should apply data to parse composite fields`() {
+    fun `should configure message factory to parse messages using different configs`() {
+        val configs = listOf(
+            Iso8583Config(
+                parses = listOf(
+                    Parse(
+                        null, null, listOf(
+                            Field(3, "NUMERIC", 6),
+                            Field(4, "AMOUNT"),
+                            Field(7, "DATE10"),
+                            Field(35, "LLVAR"),
+                            Field(37, "NUMERIC", 12)
+                        )
+                    ),
+                    Parse(
+                        "800", null, listOf(
+                            Field(3, "ALPHA", 6),
+                            Field(12, "DATE4"),
+                            Field(17, "DATE4")
+                        )
+                    )
+                )
+            ),
+            Iso8583Config(
+                parses = listOf(
+                    Parse(
+                        "0210", "untyped", listOf(
+                            Field(35, "exclude"),
+                            Field(39, "NUMERIC", 2)
+                        )
+                    ),
+                    Parse(
+                        "810", "800", listOf(
+                            Field(17, "exclude"),
+                            Field(39, "ALPHA", 2)
+                        )
+                    )
+                )
+            )
+        )
+
+        messageFactory.isUseDateTimeApi = true
+        TestConfigurer(configs).configure(messageFactory)
+        val parseMap = ReflectionTestUtils.getField(messageFactory, "parseMap")
+        parseMap.shouldBeInstanceOf<Map<Int, Map<Int, FieldParseInfo>>>()
+
+        parseMap[-1] shouldNotBeNull {
+            keys shouldBe setOf(3, 4, 7, 35, 37)
+        }
+        parseMap[0x0210] shouldNotBeNull {
+            keys shouldBe setOf(3, 4, 7, 37, 39)
+        }
+        parseMap[0x800] shouldNotBeNull {
+            keys shouldBe setOf(3, 12, 17)
+        }
+        parseMap[0x810] shouldNotBeNull {
+            keys shouldBe setOf(3, 12, 39)
+        }
+    }
+
+    @Test
+    fun `should configure message factory to parse composite fields`() {
         val config = Iso8583Config(
             parses = listOf(
                 Parse(
@@ -710,7 +848,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should apply data to parse nested composite fields`() {
+    fun `should configure message factory to parse nested composite fields`() {
         val config = Iso8583Config(
             parses = listOf(
                 Parse(
@@ -816,7 +954,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should apply data to parse messages that extend each other several times`() {
+    fun `should configure message factory to parse messages that extend each other several times`() {
         val config = Iso8583Config(
             parses = listOf(
                 Parse(
@@ -1068,7 +1206,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should apply data to parse a message that extends another one with the same composite field`() {
+    fun `should configure message factory to parse a message that extends another one with the same composite field`() {
         val config = Iso8583Config(
             parses = listOf(
                 Parse(
@@ -1116,13 +1254,11 @@ class AbstractMessageFactoryConfigurerTest {
                     composite.decoder shouldNotBeNull {
                         this.shouldBeInstanceOf<CompositeField>()
                         this.parsers.shouldMatchEach(
-                            listOf(
-                                {
-                                    it.shouldBeInstanceOf<AlphaParseInfo>()
-                                    it.type shouldBe IsoType.ALPHA
-                                    it.length shouldBe 13
-                                }
-                            )
+                            listOf {
+                                it.shouldBeInstanceOf<AlphaParseInfo>()
+                                it.type shouldBe IsoType.ALPHA
+                                it.length shouldBe 13
+                            }
                         )
                     }
                 }
@@ -1131,7 +1267,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should apply data to parse old dates with different timezones`() {
+    fun `should configure message factory to parse old dates with different timezones`() {
         val config = Iso8583Config(
             parses = listOf(
                 Parse(
@@ -1173,7 +1309,7 @@ class AbstractMessageFactoryConfigurerTest {
     }
 
     @Test
-    fun `should apply data to parse temporals with different timezones`() {
+    fun `should configure message factory to parse temporals with different timezones`() {
         val config = Iso8583Config(
             parses = listOf(
                 Parse(
@@ -1226,9 +1362,11 @@ class AbstractMessageFactoryConfigurerTest {
 
 }
 
-class TestConfigurer(val config: Iso8583Config) :
+class TestConfigurer(private val configs: List<Iso8583Config>) :
     AbstractMessageFactoryConfigurer<IsoMessage>({ type -> IsoMessage().apply { this.type = type } }) {
+    constructor(config: Iso8583Config) : this(listOf(config))
+
     override fun configure(messageFactory: MessageFactory<IsoMessage>) {
-        applyConfigs(messageFactory, listOf(config))
+        applyConfigs(messageFactory, configs)
     }
 }

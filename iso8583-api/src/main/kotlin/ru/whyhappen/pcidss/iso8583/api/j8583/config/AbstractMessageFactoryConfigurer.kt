@@ -21,6 +21,8 @@ import java.util.regex.Pattern
 abstract class AbstractMessageFactoryConfigurer<T : IsoMessage>(
     private val messageCreator: (Int) -> T,
 ) : MessageFactoryConfigurer<T> {
+    private val parseData = mutableMapOf<Int, Map<Int, FieldParseInfo>>()
+
     companion object {
         private const val UNTYPED = "untyped"
         private const val EXCLUDE = "exclude"
@@ -204,7 +206,6 @@ abstract class AbstractMessageFactoryConfigurer<T : IsoMessage>(
 
     private fun applyParses(messageFactory: MessageFactory<T>, parses: List<Parse>) {
         val extensions = mutableListOf<Triple<Int, Parse, Int>>()
-        val parseInfos = mutableMapOf<Int, Map<Int, FieldParseInfo>>()
 
         for (parse in parses) {
             val type = if (parse.type != null) parseType(parse.type) else -1
@@ -216,7 +217,7 @@ abstract class AbstractMessageFactoryConfigurer<T : IsoMessage>(
                         field.num to getParserInfo(messageFactory, field)
                     }
                     messageFactory.setParseMap(type, parseMap)
-                    parseInfos += type to parseMap
+                    parseData += type to parseMap
                 }
 
                 // parse element extends untyped one
@@ -228,7 +229,7 @@ abstract class AbstractMessageFactoryConfigurer<T : IsoMessage>(
         }
 
         for ((type, parse, ref) in extensions) {
-            val extendedParseMap = parseInfos[ref] ?: throw IllegalArgumentException(
+            val extendedParseMap = parseData[ref] ?: throw IllegalArgumentException(
                 "Parse element ${parse.type} extends nonexistent template ${parse.extends}"
             )
             val excludedFields = parse.fields
@@ -248,7 +249,7 @@ abstract class AbstractMessageFactoryConfigurer<T : IsoMessage>(
             }
 
             messageFactory.setParseMap(type, resultMap)
-            parseInfos += type to resultMap
+            parseData += type to resultMap
         }
     }
 
