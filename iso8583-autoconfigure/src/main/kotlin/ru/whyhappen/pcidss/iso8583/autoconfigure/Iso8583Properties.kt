@@ -1,10 +1,11 @@
 package ru.whyhappen.pcidss.iso8583.autoconfigure
 
-import com.github.kpavlov.jreactive8583.iso.ISO8583Version
-import com.github.kpavlov.jreactive8583.iso.MessageOrigin
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder
+import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
+import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.core.io.Resource
-import java.nio.charset.StandardCharsets
+import ru.whyhappen.pcidss.iso8583.reactor.*
 
 /**
  * Configuration properties for ISO8583 server and client.
@@ -34,13 +35,40 @@ data class ConnectionProperties(
      */
     var port: Int = 9876,
     /**
-     * Indicates if management messages should be sent and received.
+     * Maximum length of the TCP frame.
      */
-    var addEchoMessageListener: Boolean = false,
+    val maxFrameLength: Int = DEFAULT_MAX_FRAME_LENGTH,
+    /**
+     * Length of TCP frame length field.
+     *
+     * @see LengthFieldBasedFrameDecoder
+     */
+    val frameLengthFieldLength: Int = DEFAULT_FRAME_LENGTH_FIELD_LENGTH,
+
+    /**
+     * Offset of the length field.
+     *
+     * @see LengthFieldBasedFrameDecoder
+     */
+    val frameLengthFieldOffset: Int = DEFAULT_FRAME_LENGTH_FIELD_OFFSET,
+    /**
+     * Compensation value to add to the value of the length field.
+     *
+     * @see LengthFieldBasedFrameDecoder
+     */
+    val frameLengthFieldAdjust: Int = DEFAULT_FRAME_LENGTH_FIELD_ADJUST,
+    /**
+     * If `true` then the length header is to be encoded as a String, as opposed to the default binary.
+     */
+    val encodeFrameLengthAsString: Boolean = false,
+    /**
+     * Indicates if management messages should be sent if connection is idle.
+     */
+    var addIdleEventHandler: Boolean = false,
     /**
      * Timeout between heartbeats in seconds.
      */
-    var idleTimeout: Int = 30,
+    var idleTimeout: Int = DEFAULT_IDLE_TIMEOUT_SECONDS,
     /**
      * Indicates if a reply with an administrative message should be sent in case of message syntax errors.
      */
@@ -73,52 +101,7 @@ data class Iso8583MessageProperties(
      */
     var role: MessageOrigin = MessageOrigin.ACQUIRER,
     /**
-     * Indicates if the current date should be set on new messages (field 7).
-     */
-    var assignDate: Boolean = true,
-    /**
-     * Indicates if the header should be written/parsed as binary.
-     */
-    var binaryHeader: Boolean = false,
-    /**
-     * Indicates if the fields should be written/parsed as binary.
-     */
-    var binaryFields: Boolean = false,
-    /**
-     * ETX character, which is sent at the end of the message as a terminator.
-     * Default is -1, which means no terminator is sent.
-     */
-    var etx: Int = -1,
-    /**
-     * Flag to specify if missing fields should be ignored as long as they're at the end of the message.
-     */
-    var ignoreLastMissingField: Boolean = false,
-    /**
-     * Flag to pass to new messages to include a secondary bitmap even if it's not needed.
-     */
-    var forceSecondaryBitmap: Boolean = false,
-    /**
-     * Flag to create messages that encode their bitmaps in binary format even when they're encoded as text.
-     * Has no effect on binary messages.
-     */
-    var binaryBitmap: Boolean = false,
-    /**
-     * Indicates whether length headers for variable-length fields in text mode should be decoded
-     * using proper string conversion with the character encoding.
-     * Default is `false`, which means to use the old behavior of decoding as ASCII.
-     */
-    var forceStringEncoding: Boolean = false,
-    /**
-     * Indicates whether length headers for variable-length fields in binary mode should be decoded as
-     * a hexadecimal values. Default is `false`, which means decoding the length as BCD.
-     */
-    var variableLengthFieldsInHex: Boolean = false,
-    /**
-     * Character encoding used for parsing ALPHA, LLVAR and LLLVAR fields.
-     */
-    var characterEncoding: String = StandardCharsets.US_ASCII.name(),
-    /**
-     * Resources to configure the message factory. They are applied consecutively.
+     * Resources to build the message spec. They are applied consecutively.
      */
     var configs: List<Resource> = emptyList(),
     /**
@@ -130,5 +113,5 @@ data class Iso8583MessageProperties(
         35, // track 2
         36, // track 3
         45, // track 1
-    ),
+    )
 )

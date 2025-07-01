@@ -31,7 +31,6 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import ru.whyhappen.pcidss.service.Encryptor
 import ru.whyhappen.pcidss.service.KeyRepository
 import javax.crypto.spec.SecretKeySpec
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.random.Random
 import kotlin.test.BeforeTest
@@ -57,8 +56,7 @@ class RedisTokenServiceTest {
     private val previousKey = SecretKeySpec("previousKey".toByteArray(), "HmacSHA256")
 
     @OptIn(ExperimentalEncodingApi::class)
-    private val data = Base64.encode(Random.Default.nextBytes(16))
-    private val dataAsByteArray = data.toByteArray(Charsets.UTF_8)
+    private val data = Random.Default.nextBytes(16)
     private val token = "token"
 
     companion object {
@@ -77,49 +75,49 @@ class RedisTokenServiceTest {
         redisTemplate.connectionFactory.reactiveConnection.serverCommands().flushDb().awaitSingle()
 
         every { keyRepository.currentKey } returns currentKey
-        every { encryptor.encrypt(currentKey, dataAsByteArray) } returns currentKey.encoded + dataAsByteArray
+        every { encryptor.encrypt(currentKey, data) } returns currentKey.encoded + data
     }
 
     @Test
     fun `should find token if it exists among current keys`() = runTest {
-        redisTemplate.opsForValue().set(currentKey.encoded + dataAsByteArray, token).awaitSingle()
+        redisTemplate.opsForValue().set(currentKey.encoded + data, token).awaitSingle()
 
         val tokenService = RedisTokenService(redisTemplate, keyRepository, encryptor)
         tokenService.getToken(data) shouldBe token
 
         verifySequence {
             keyRepository.currentKey
-            encryptor.encrypt(currentKey, dataAsByteArray)
+            encryptor.encrypt(currentKey, data)
         }
 
-        redisTemplate.hasKey(previousKey.encoded + dataAsByteArray).awaitSingle().shouldBeFalse()
+        redisTemplate.hasKey(previousKey.encoded + data).awaitSingle().shouldBeFalse()
     }
 
     @Test
     fun `should find token if it exists among previous keys`() = runTest {
-        redisTemplate.opsForValue().set(previousKey.encoded + dataAsByteArray, token).awaitSingle()
+        redisTemplate.opsForValue().set(previousKey.encoded + data, token).awaitSingle()
 
         every { keyRepository.previousKey } returns previousKey
-        every { encryptor.encrypt(previousKey, dataAsByteArray) } returns previousKey.encoded + dataAsByteArray
+        every { encryptor.encrypt(previousKey, data) } returns previousKey.encoded + data
 
         val tokenService = RedisTokenService(redisTemplate, keyRepository, encryptor)
         tokenService.getToken(data) shouldBe token
 
         verifySequence {
             keyRepository.currentKey
-            encryptor.encrypt(currentKey, dataAsByteArray)
+            encryptor.encrypt(currentKey, data)
             keyRepository.previousKey
-            encryptor.encrypt(previousKey, dataAsByteArray)
+            encryptor.encrypt(previousKey, data)
         }
 
-        redisTemplate.opsForValue().get(currentKey.encoded + dataAsByteArray).awaitSingle() shouldBe token
-        redisTemplate.hasKey(previousKey.encoded + dataAsByteArray).awaitSingle().shouldBeFalse()
+        redisTemplate.opsForValue().get(currentKey.encoded + data).awaitSingle() shouldBe token
+        redisTemplate.hasKey(previousKey.encoded + data).awaitSingle().shouldBeFalse()
     }
 
     @Test
     fun `should generate a new token if it doesn't exist among current and previous keys`() = runTest {
         every { keyRepository.previousKey } returns previousKey
-        every { encryptor.encrypt(previousKey, dataAsByteArray) } returns previousKey.encoded + dataAsByteArray
+        every { encryptor.encrypt(previousKey, data) } returns previousKey.encoded + data
 
         val tokenService = RedisTokenService(redisTemplate, keyRepository, encryptor)
         val result = tokenService.getToken(data)
@@ -128,13 +126,13 @@ class RedisTokenServiceTest {
 
         verifySequence {
             keyRepository.currentKey
-            encryptor.encrypt(currentKey, dataAsByteArray)
+            encryptor.encrypt(currentKey, data)
             keyRepository.previousKey
-            encryptor.encrypt(previousKey, dataAsByteArray)
+            encryptor.encrypt(previousKey, data)
         }
 
-        redisTemplate.opsForValue().get(currentKey.encoded + dataAsByteArray).awaitSingle() shouldBe result
-        redisTemplate.hasKey(previousKey.encoded + dataAsByteArray).awaitSingle().shouldBeFalse()
+        redisTemplate.opsForValue().get(currentKey.encoded + data).awaitSingle() shouldBe result
+        redisTemplate.hasKey(previousKey.encoded + data).awaitSingle().shouldBeFalse()
     }
 
     @Test
@@ -148,12 +146,12 @@ class RedisTokenServiceTest {
 
         verifySequence {
             keyRepository.currentKey
-            encryptor.encrypt(currentKey, dataAsByteArray)
+            encryptor.encrypt(currentKey, data)
             keyRepository.previousKey
         }
 
-        redisTemplate.opsForValue().get(currentKey.encoded + dataAsByteArray).awaitSingle() shouldBe result
-        redisTemplate.hasKey(previousKey.encoded + dataAsByteArray).awaitSingle().shouldBeFalse()
+        redisTemplate.opsForValue().get(currentKey.encoded + data).awaitSingle() shouldBe result
+        redisTemplate.hasKey(previousKey.encoded + data).awaitSingle().shouldBeFalse()
     }
 
     @Test
@@ -165,8 +163,8 @@ class RedisTokenServiceTest {
         val tokenService = RedisTokenService(spyRedisTemplate, keyRepository, encryptor)
 
         every { keyRepository.previousKey } returns null
-        every { operations.setIfAbsent(currentKey.encoded + dataAsByteArray, any<String>()) } answers {
-            redisTemplate.opsForValue().set(currentKey.encoded + dataAsByteArray, token)
+        every { operations.setIfAbsent(currentKey.encoded + data, any<String>()) } answers {
+            redisTemplate.opsForValue().set(currentKey.encoded + data, token)
                 .then(callOriginal())
         }
 
@@ -174,11 +172,11 @@ class RedisTokenServiceTest {
 
         verifySequence {
             keyRepository.currentKey
-            encryptor.encrypt(currentKey, dataAsByteArray)
-            operations.get(currentKey.encoded + dataAsByteArray)
+            encryptor.encrypt(currentKey, data)
+            operations.get(currentKey.encoded + data)
             keyRepository.previousKey
-            operations.setIfAbsent(currentKey.encoded + dataAsByteArray, any<String>())
-            operations.get(currentKey.encoded + dataAsByteArray)
+            operations.setIfAbsent(currentKey.encoded + data, any<String>())
+            operations.get(currentKey.encoded + data)
         }
     }
 

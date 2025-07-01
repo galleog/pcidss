@@ -3,7 +3,7 @@ package ru.whyhappen.pcidss.iso8583.autoconfigure.server
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.ApplicationEventPublisherAware
 import org.springframework.context.SmartLifecycle
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
+import ru.whyhappen.pcidss.iso8583.reactor.server.Iso8583Server
 
 /**
  * Bootstrap an [Iso8583Server] and start it with the application context.

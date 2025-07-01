@@ -1,14 +1,10 @@
 package ru.whyhappen.pcidss.iso8583
 
-import com.github.kpavlov.jreactive8583.iso.MessageFactory
 import com.nfeld.jsonpathkt.kotlinx.resolvePathAsStringOrNull
-import com.solab.iso8583.IsoMessage
-import com.solab.iso8583.IsoType
-import com.solab.iso8583.IsoValue
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerifyAll
-import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.verifyAll
@@ -21,7 +17,20 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageCustomizer
+import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
+import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
+import ru.whyhappen.pcidss.iso8583.fields.Bitmap
+import ru.whyhappen.pcidss.iso8583.fields.StringField
+import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
+import ru.whyhappen.pcidss.iso8583.mti.MessageClass
+import ru.whyhappen.pcidss.iso8583.mti.MessageFunction
+import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
+import ru.whyhappen.pcidss.iso8583.pad.StartPadder
+import ru.whyhappen.pcidss.iso8583.prefix.AsciiFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.prefix.AsciiVarPrefixer
+import ru.whyhappen.pcidss.iso8583.prefix.BinaryFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
+import ru.whyhappen.pcidss.iso8583.spec.Spec
 import ru.whyhappen.pcidss.service.TokenService
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -32,11 +41,91 @@ import kotlin.test.Test
 @ExtendWith(MockKExtension::class)
 class ExternalIsoMessageHandlerTest {
     @MockK
-    private lateinit var messageFactory: MessageFactory<IsoMessage>
-    @MockK
     private lateinit var tokenService: TokenService
     @MockK(relaxed = true)
     private lateinit var customizer: IsoMessageCustomizer
+
+    private val messageFactory = DefaultMessageFactory(
+        ISO8583Version.V1987,
+        MessageOrigin.ACQUIRER,
+        MessageSpec(
+            mapOf(
+                0 to StringField(
+                    spec = Spec(
+                        4,
+                        "Message Type Indicator",
+                        AsciiEncoder(),
+                        AsciiFixedPrefixer()
+                    )
+                ),
+                1 to Bitmap(
+                    Spec(
+                        8,
+                        "Bitmap",
+                        BinaryEncoder(),
+                        BinaryFixedPrefixer()
+                    )
+                ),
+                2 to StringField(
+                    spec = Spec(
+                        19,
+                        "Primary Account Number",
+                        AsciiEncoder(),
+                        AsciiVarPrefixer(2)
+                    )
+                ),
+                4 to StringField(
+                    spec = Spec(
+                        12,
+                        "Transaction Amount",
+                        AsciiEncoder(),
+                        AsciiFixedPrefixer(),
+                        StartPadder('0')
+                    )
+                ),
+                7 to StringField(
+                    spec = Spec(
+                        10,
+                        "Transmission Date & Time",
+                        AsciiEncoder(),
+                        AsciiFixedPrefixer()
+                    )
+                ),
+                11 to StringField(
+                    spec = Spec(
+                        6,
+                        "Systems Trace Audit Number (STAN)",
+                        AsciiEncoder(),
+                        AsciiFixedPrefixer()
+                    )
+                ),
+                12 to StringField(
+                    spec = Spec(
+                        6,
+                        "Local Transaction Time",
+                        AsciiEncoder(),
+                        AsciiFixedPrefixer()
+                    )
+                ),
+                34 to StringField(
+                    spec = Spec(
+                        28,
+                        "Extended Primary Account Number",
+                        AsciiEncoder(),
+                        AsciiVarPrefixer(2)
+                    )
+                ),
+                39 to StringField(
+                    spec = Spec(
+                        2,
+                        "Response Code",
+                        AsciiEncoder(),
+                        AsciiFixedPrefixer()
+                    )
+                )
+            )
+        )
+    )
 
     private lateinit var webClient: WebClient
     private lateinit var handler: ExternalIsoMessageHandler
@@ -69,7 +158,11 @@ class ExternalIsoMessageHandlerTest {
     fun `should tokenize fields and update fields set by the external service`() = runTest {
         val mockResponse = """{
                 "2": "token1",
-                "39": "01"
+                "4": "456",
+                "7": "0630200856",
+                "11": "654321",
+                "34": "token2",
+                "39": "00"
             }""".trimIndent()
 
         mockWebServer.enqueue(
@@ -79,63 +172,50 @@ class ExternalIsoMessageHandlerTest {
                 .setBody(mockResponse)
         )
 
-        val inboundMessage = IsoMessage().apply {
-            type = 0x200
-            setField(2, IsoValue(IsoType.NUMERIC, "650000", 6))
-            setField(32, IsoValue(IsoType.LLVAR, "456"))
-            setField(35, IsoValue(IsoType.LLVAR, "4591700012340000"))
-            setField(60, IsoValue(IsoType.LLLVAR, "B456PRO1+000"))
-            setField(61, IsoValue(IsoType.LLLVAR, "1234P"))
-        }
+        val requestMessage = messageFactory.newMessage(MessageClass.FINANCIAL, MessageFunction.REQUEST)
+            .apply {
+                setFieldValue(2, "4242424242424242")
+                setFieldValue(4, "456")
+                setFieldValue(7, "0630200856")
+                setFieldValue(11, "123456")
+                setFieldValue(34, "2345674242424242424242123456")
+            }
 
-        val responseMessage = IsoMessage().apply {
-            type = 0x210
-            (2..128).asSequence()
-                .filter(inboundMessage::hasField)
-                .forEach {
-                    setField(it, inboundMessage.getAt<Any>(it).clone())
-                }
-            setField(39, IsoValue(IsoType.NUMERIC, "", 2))
-            updateValue(60, "Fixed value 60")
-            setField(70, IsoValue(IsoType.ALPHA, "ABC", 3))
-        }
+        coEvery { tokenService.getToken(requestMessage.getFieldValue(2, ByteArray::class.java)!!) } returns "token1"
+        coEvery { tokenService.getToken(requestMessage.getFieldValue(34, ByteArray::class.java)!!) } returns "token2"
 
-        coEvery { tokenService.getToken(inboundMessage.getObjectValue(2)) } returns "token1"
-        coEvery { tokenService.getToken(inboundMessage.getObjectValue(35)) } returns "token2"
-        every { messageFactory.createResponse(inboundMessage) } returns responseMessage
+        handler = ExternalIsoMessageHandler(listOf(2, 34), messageFactory, tokenService, webClient, listOf(customizer))
 
-        handler = ExternalIsoMessageHandler(listOf(2, 35), messageFactory, tokenService, webClient, customizer)
-
-        with(handler.onMessage(inboundMessage)) {
-            type shouldBe 0x210
-            getObjectValue<String>(2) shouldBe inboundMessage.getObjectValue(2)
-            getObjectValue<String>(32) shouldBe inboundMessage.getObjectValue(32)
-            getObjectValue<String>(35) shouldBe inboundMessage.getObjectValue(35)
-            getObjectValue<String>(39) shouldBe "01"
-            getObjectValue<String>(60) shouldBe responseMessage.getObjectValue(60)
-            getObjectValue<String>(61) shouldBe inboundMessage.getObjectValue(61)
-            getObjectValue<String>(70) shouldBe responseMessage.getObjectValue(70)
+        val responseMessage = handler.onMessage(requestMessage)
+        with(responseMessage) {
+            mti shouldBe 0x210
+            fields.keys shouldContainExactly setOf(2, 4, 7, 11, 34, 39)
+            getFieldValue(2, String::class.java) shouldBe requestMessage.getFieldValue(2, String::class.java)
+            getFieldValue(4, String::class.java) shouldBe "456"
+            getFieldValue(7, String::class.java) shouldBe "0630200856"
+            getFieldValue(11, String::class.java) shouldBe "654321"
+            getFieldValue(34, String::class.java) shouldBe requestMessage.getFieldValue(34, String::class.java)
+            getFieldValue(39, String::class.java) shouldBe "00"
         }
 
         val recordedRequest = mockWebServer.takeRequest()
         recordedRequest.method shouldBe "POST"
 
         with(Json.parseToJsonElement(recordedRequest.body.readUtf8())) {
-            resolvePathAsStringOrNull("$.0") shouldBe "%04x".format(inboundMessage.type)
+            resolvePathAsStringOrNull("$.0") shouldBe "%04x".format(requestMessage.mti)
             resolvePathAsStringOrNull("$.2") shouldBe "token1"
-            resolvePathAsStringOrNull("$.32") shouldBe inboundMessage.getObjectValue(32)
-            resolvePathAsStringOrNull("$.35") shouldBe "token2"
-            resolvePathAsStringOrNull("$.60") shouldBe inboundMessage.getObjectValue(60)
-            resolvePathAsStringOrNull("$.61") shouldBe inboundMessage.getObjectValue(61)
+            resolvePathAsStringOrNull("$.4") shouldBe requestMessage.getFieldValue(4, String::class.java)
+            resolvePathAsStringOrNull("$.7") shouldBe requestMessage.getFieldValue(7, String::class.java)
+            resolvePathAsStringOrNull("$.11") shouldBe requestMessage.getFieldValue(11, String::class.java)
+            resolvePathAsStringOrNull("$.34") shouldBe "token2"
         }
 
         coVerifyAll {
-            tokenService.getToken(inboundMessage.getObjectValue(2))
-            tokenService.getToken(inboundMessage.getObjectValue(35))
+            tokenService.getToken(requestMessage.getFieldValue(2, ByteArray::class.java)!!)
+            tokenService.getToken(requestMessage.getFieldValue(34, ByteArray::class.java)!!)
         }
 
         verifyAll {
-            messageFactory.createResponse(inboundMessage)
             customizer.customize(responseMessage)
         }
     }

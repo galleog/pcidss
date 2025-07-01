@@ -1,6 +1,6 @@
 package ru.whyhappen.pcidss.bpc
 
-import com.github.kpavlov.jreactive8583.iso.MessageFactory
+import ru.whyhappen.pcidss.iso8583.MessageFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Configuration

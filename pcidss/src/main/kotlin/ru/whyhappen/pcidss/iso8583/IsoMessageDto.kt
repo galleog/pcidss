@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
-import com.solab.iso8583.IsoMessage
 
 /**
  * DTO for [IsoMessage] with flattened JSON representation.
@@ -48,18 +47,15 @@ class IsoMessageDtoSerializer : StdSerializer<IsoMessageDto>(IsoMessageDto::clas
  */
 class IsoMessageDtoDeserializer : StdDeserializer<IsoMessageDto>(IsoMessageDto::class.java) {
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): IsoMessageDto {
-        val node = p.codec.readTree<JsonNode>(p)
+        val node = p.readValueAsTree<JsonNode>()
 
         // parse MTI from field "0" if present
-        val mti = node.get("0")?.asText()?.toInt(16)
+        val mti = node.get("0")?.textValue()?.toInt(16)
 
         // collect all non-0 fields
-        val fields = mutableMapOf<Int, String>()
-        node.fields().forEach { (key, value) ->
-            if (key != "0") {
-                key.toIntOrNull()?.let { num -> fields[num] = value.asText() }
-            }
-        }
+        val fields = node.properties().filter { (key, _) -> key != "0" }
+            .mapNotNull { (key, value) -> key.toIntOrNull()?.let { it to value.textValue() } }
+            .toMap()
 
         return IsoMessageDto(mti, fields)
     }

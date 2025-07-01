@@ -5,10 +5,10 @@ package ru.whyhappen.pcidss.service
  */
 interface TokenService {
     /**
-     * Tokenizes a string.
+     * Tokenizes a field value.
      *
-     * @param value the string to get a token for
+     * @param value the byte array to get a token for
      * @return the calculated token
      */
-    suspend fun getToken(value: String): String
+    suspend fun getToken(value: ByteArray): String
 }

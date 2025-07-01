@@ -1,7 +1,7 @@
 package ru.whyhappen.pcidss.iso8583.autoconfigure.server
 
 import org.springframework.context.ApplicationEvent
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
+import ru.whyhappen.pcidss.iso8583.reactor.server.Iso8583Server
 
 /**
  * Event to be published after the application context is refreshed and the [Iso8583Server] is started.

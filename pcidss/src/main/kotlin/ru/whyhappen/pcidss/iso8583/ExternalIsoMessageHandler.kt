@@ -1,20 +1,17 @@
 package ru.whyhappen.pcidss.iso8583
 
-import com.github.kpavlov.jreactive8583.iso.MessageFactory
-import com.solab.iso8583.IsoMessage
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.awaitBody
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageCustomizer
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
+import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.IsoMessageHandler
 import ru.whyhappen.pcidss.service.TokenService
 
 /**
  * Message handler that delegates message processing to an external service.
  * It tokenizes sensitive data fields of an ISO message and sends the message to that service.
- * Then uses the data it gets from the service to send an ISO response message.
+ * It uses the data it gets from the service to send an ISO response message.
  */
 class ExternalIsoMessageHandler(
     /**
@@ -34,9 +31,9 @@ class ExternalIsoMessageHandler(
      */
     private val webClient: WebClient,
     /**
-     * Optional customizer for an ISO response message.
+     * Optional customizers for an ISO response message.
      */
-    private val customizer: IsoMessageCustomizer? = null,
+    private val customizers: List<IsoMessageCustomizer> = emptyList()
 ) : IsoMessageHandler {
     companion object {
         private val logger = LoggerFactory.getLogger(ExternalIsoMessageHandler::class.java)
@@ -51,7 +48,7 @@ class ExternalIsoMessageHandler(
                 .asSequence()
                 .filter(inbound::hasField)
                 .map {
-                    val value = inbound.getAt<Any>(it).toString()
+                    val value = inbound.getFieldValue(it, ByteArray::class.java)!!
                     it to async { tokenService.getToken(value) }
                 }.toList()
 
@@ -62,10 +59,8 @@ class ExternalIsoMessageHandler(
 
             // send the incoming message to the external service
             val reqBody = IsoMessageDto(
-                inbound.type,
-                (2..128).asSequence()
-                    .filter(inbound::hasField)
-                    .associateWith { tokens[it] ?: inbound.getAt<Any>(it).toString() }
+                inbound.mti,
+                inbound.fields.mapValues { (id, field) -> tokens[id] ?: field.getValue(String::class.java)!! }
             )
             webClient.post()
                 .accept(MediaType.APPLICATION_JSON)
@@ -74,23 +69,23 @@ class ExternalIsoMessageHandler(
                 .awaitBody<IsoMessageDto>()
         }
 
-        return messageFactory.createResponse(inbound)
-            .apply {
-                // copy fields to the response message
-                for ((key, value) in respBody.fields) {
-                    if (key !in sensitiveDataFields && hasField(key)) {
-                        updateValue(key, value)
-                    } else {
-                        logger.warn(
-                            "Unknown response field {} with value {} for IsoMessage[type=0x{}]",
-                            key,
-                            value,
-                            "%04x".format(type)
-                        )
-                    }
-                }
+        val response = messageFactory.createResponse(inbound)
 
-                customizer?.customize(this)
+        // copy fields to the response message
+        for ((key, value) in respBody.fields) {
+            if (key !in sensitiveDataFields) {
+                runCatching {
+                    response.setFieldValue(key, value)
+                }.onFailure {
+                    logger.warn("Unknown response field {} with value {} for {}", key, value, response)
+                }
             }
+        }
+
+        for (customizer in customizers) {
+            if (!customizer.customize(response)) break
+        }
+
+        return response
     }
 }

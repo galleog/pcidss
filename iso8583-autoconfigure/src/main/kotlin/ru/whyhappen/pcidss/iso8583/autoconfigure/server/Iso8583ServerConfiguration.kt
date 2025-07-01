@@ -1,8 +1,6 @@
 package ru.whyhappen.pcidss.iso8583.autoconfigure.server
 
-import com.github.kpavlov.jreactive8583.iso.MessageFactory
-import com.github.kpavlov.jreactive8583.server.ServerConfiguration
-import com.solab.iso8583.IsoMessage
+import ru.whyhappen.pcidss.iso8583.MessageFactory
 import io.micrometer.observation.ObservationRegistry
 import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
@@ -10,14 +8,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.annotation.Order
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.DefaultExceptionHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.EchoMessageHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.ExceptionHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.handler.IsoMessageHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.IdleEventHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.pipeline.ParseExceptionHandler
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
+import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.DefaultExceptionHandler
+import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.EchoMessageHandler
+import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.ExceptionHandler
+import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.IsoMessageHandler
+import ru.whyhappen.pcidss.iso8583.reactor.netty.pipeline.IdleEventHandler
+import ru.whyhappen.pcidss.iso8583.reactor.netty.pipeline.DecoderExceptionHandler
+import ru.whyhappen.pcidss.iso8583.reactor.server.Iso8583Server
 import ru.whyhappen.pcidss.iso8583.autoconfigure.Iso8583Properties
+import ru.whyhappen.pcidss.iso8583.IsoMessage
+import ru.whyhappen.pcidss.iso8583.reactor.server.ServerConfiguration
 
 /**
  * Configuration for [Iso8583Server].
@@ -33,11 +33,16 @@ class Iso8583ServerConfiguration {
         messageHandlers: ObjectProvider<IsoMessageHandler>,
         observationRegistry: ObjectProvider<ObservationRegistry>,
         exceptionHandler: ObjectProvider<ExceptionHandler>,
-        parseExceptionHandler: ObjectProvider<ParseExceptionHandler>,
+        decoderExceptionHandler: ObjectProvider<DecoderExceptionHandler>,
         idleEventHandler: ObjectProvider<IdleEventHandler>
     ): Iso8583Server {
         val configuration = ServerConfiguration.newBuilder()
-            .addEchoMessageListener(properties.connection.addEchoMessageListener)
+            .maxFrameLength(properties.connection.maxFrameLength)
+            .frameLengthFieldLength(properties.connection.frameLengthFieldLength)
+            .frameLengthFieldOffset(properties.connection.frameLengthFieldOffset)
+            .frameLengthFieldAdjust(properties.connection.frameLengthFieldAdjust)
+            .encodeFrameLengthAsString(properties.connection.encodeFrameLengthAsString)
+            .addIdleEventHandler(properties.connection.addIdleEventHandler)
             .idleTimeout(properties.connection.idleTimeout)
             .replyOnError(properties.connection.replyOnError)
             .addLoggingHandler(properties.connection.addLoggingHandler)
@@ -53,7 +58,7 @@ class Iso8583ServerConfiguration {
             messageHandlers.orderedStream().toList(),
             observationRegistry.ifAvailable ?: ObservationRegistry.NOOP,
             exceptionHandler.ifAvailable ?: DefaultExceptionHandler(messageFactory, true),
-            parseExceptionHandler.ifAvailable ?: ParseExceptionHandler(messageFactory, true),
+            decoderExceptionHandler.ifAvailable ?: DecoderExceptionHandler(messageFactory, true),
             idleEventHandler.ifAvailable ?: IdleEventHandler(messageFactory)
         )
     }

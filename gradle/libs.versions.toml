@@ -1,7 +1,6 @@
 [versions]
 kotlin = "2.0.21"
-spring-boot = "3.4.5"
-jreactive8583 = "1.5.1"
+spring-boot = "3.5.3"
 bc-fips = "2.1.0"
 mockk = "1.13.17"
 kotest = "5.9.1"
@@ -14,7 +13,6 @@ shedlock = "6.6.0"
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-allopen-plugin = { group = "org.jetbrains.kotlin.plugin.allopen", name = "org.jetbrains.kotlin.plugin.allopen.gradle.plugin", version.ref = "kotlin" }
 spring-boot-bom = { group = "org.springframework.boot", name = "spring-boot-dependencies", version.ref = "spring-boot" }
-jreactive8583 = { group = "com.github.kpavlov.jreactive8583", name = "netty-iso8583", version.ref = "jreactive8583" }
 bc-fips = { group = "org.bouncycastle", name = "bc-fips", version.ref = "bc-fips" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotest-bom = { group = "io.kotest", name = "kotest-bom", version.ref = "kotest" }

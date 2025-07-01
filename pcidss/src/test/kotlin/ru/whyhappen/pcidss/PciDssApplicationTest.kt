@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
-import ru.whyhappen.pcidss.iso8583.api.reactor.netty.server.Iso8583Server
+import ru.whyhappen.pcidss.iso8583.reactor.server.Iso8583Server
 
 @SpringBootTest
 @ActiveProfiles("test")

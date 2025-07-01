@@ -24,11 +24,10 @@ class RedisTokenService(
         private val logger = LoggerFactory.getLogger(RedisTokenService::class.java)
     }
 
-    override suspend fun getToken(value: String): String = coroutineScope {
-        val data = value.toByteArray(Charsets.UTF_8)
-        val key = encryptor.encrypt(keyRepository.currentKey, data)
+    override suspend fun getToken(value: ByteArray): String = coroutineScope {
+        val key = encryptor.encrypt(keyRepository.currentKey, value)
         operations.get(key)
-            .switchIfEmpty(Mono.defer { tryGetPrevious(key, data) })
+            .switchIfEmpty(Mono.defer { tryGetPrevious(key, value) })
             .awaitSingle()
             .also { logger.debug("Token '{}' found", it) }
     }

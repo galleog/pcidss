@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation(platform(libs.spring.boot.bom))
 
-    implementation(project(":iso8583-api"))
+    implementation(project(":iso8583"))
     implementation(project(":iso8583-autoconfigure"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")
 }

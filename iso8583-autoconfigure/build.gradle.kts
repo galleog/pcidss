@@ -6,7 +6,7 @@ dependencies {
     implementation(platform(libs.spring.boot.bom))
     implementation(platform(libs.kotest.bom))
 
-    implementation(project(":iso8583-api"))
+    implementation(project(":iso8583"))
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("io.micrometer:micrometer-observation")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
