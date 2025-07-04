@@ -43,7 +43,7 @@ class AsciiVarPrefixerTest {
     @ParameterizedTest
     @MethodSource("testDecodeData")
     fun `should decode length`(prefixer: Prefixer, maxLen: Int, length: Int, data: ByteArray) {
-        prefixer.decodeLength(maxLen, data) shouldBe (length to prefixer.bytesSize)
+        prefixer.decodeLength(maxLen, data) shouldBe (length to prefixer.digits)
     }
 
     @Test

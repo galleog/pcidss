@@ -5,7 +5,7 @@ import ru.whyhappen.pcidss.iso8583.fields.IsoField
 /**
  * Interface to represent an ISO8583 message.
  */
-interface IsoMessage : Packer {
+interface IsoMessage {
     /**
      * MTI (Message Type Identifier).
      * A four-byte code that identifies the type of the message.
@@ -48,6 +48,17 @@ interface IsoMessage : Packer {
      * Indicates if the value of the field with the given `id` was set.
      */
     fun hasField(id: Int): Boolean
+
+    /**
+     * Serializes the message into its binary representation.
+     */
+    fun pack(): ByteArray
+    /**
+     * Deserializes the message from its binary representation.
+     *
+     * @return the number of read bytes
+     */
+    fun unpack(bytes: ByteArray): Int
 
     /**
      * Creates a copy of the message.

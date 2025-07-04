@@ -1,30 +1,27 @@
 package ru.whyhappen.pcidss.iso8583.encode
 
-import ru.whyhappen.pcidss.iso8583.fields.IsoField
-
 /**
  * [Encoder] that converts bytes into their ASCII representation.
  * On success, the ASCII representation bytes are returned.
- *
- * Don't use this encoder with string, numeric or binary fields as packing and
- * unpacking in these fields uses length of value/bytes, so only [IsoField.pack] will be
- * able to write the value correctly.
  */
 @OptIn(ExperimentalStdlibApi::class)
 class BytesToAsciiHexEncoder : Encoder {
     /**
      * Converts bytes into their ASCII representation.
-     * On success, the ASCII representation bytes are returned, e.g. [0x5F, 0x2A] would be "5F2A".
+     *
+     * @return the ASCII representation bytes ([0x5F, 0x2A] would be "5F2A")
      */
     override fun encode(data: ByteArray): ByteArray {
         val hexStr = data.toHexString(HexFormat.UpperCase)
-        return hexStr.toByteArray()
+        return hexStr.toByteArray(Charsets.US_ASCII)
     }
 
     /**
      * Decodes ASCII hexadecimal string and returns bytes and the number of read hex bytes.
-     * Length is the number of hexadecimal digits (two ASCII characters is one hexadecimal digit);
-     * e.g. "AABBCC" would be converted into [0xAA, 0xBB, 0xCC].
+     *
+     * @param length the number of hexadecimal digits (two ASCII characters is one hexadecimal digit)
+     * @return the actual bytes of the ASCII representation ("AABBCC" would be converted into [0xAA, 0xBB, 0xCC]) and
+     * the number of read bytes (twice as much as [length])
      */
     override fun decode(data: ByteArray, length: Int): Pair<ByteArray, Int> {
         checkEncoder(length >= 0) { "Length $length can't be negative" }

@@ -9,9 +9,9 @@ import kotlin.contracts.contract
  */
 interface Prefixer {
     /**
-     * Number of bytes needed to encode field length.
+     * Number of digits the prefixer can encode.
      */
-    val bytesSize: Int
+    val digits: Int
     /**
      * Returns field length encoded into a byte array.
      *
@@ -33,7 +33,7 @@ interface Prefixer {
 /**
  * Exception thrown by [Prefixer].
  */
-class PrefixerException(message: String) : IsoException(message)
+class PrefixerException(message: String, cause: Throwable? = null) : IsoException(message, cause)
 
 @OptIn(ExperimentalContracts::class)
 inline fun checkPrefixer(value: Boolean, lazyMessage: () -> String) {

@@ -13,10 +13,6 @@ class BinaryField(value: ByteArray? = null, spec: Spec) :
     override val valueType = TypeDescriptor.valueOf(ByteArray::class.java)
 
     override fun copyOf(): IsoField = BinaryField(innerValue?.copyOf(), spec)
-
-    override fun reset() {
-        innerValue = null
-    }
 }
 
 class BinaryConversionService : GenericConversionService() {

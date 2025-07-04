@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
-import ru.whyhappen.pcidss.iso8583.Packer
 import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
 import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
 import ru.whyhappen.pcidss.iso8583.encode.BytesToAsciiHexEncoder
@@ -25,7 +24,7 @@ import kotlin.contracts.contract
  * Field of an ISO8583 message.
  */
 @JsonDeserialize(using = IsoFieldDeserializer::class)
-interface IsoField : Packer {
+interface IsoField {
     /**
      * Field specification.
      */
@@ -49,6 +48,17 @@ interface IsoField : Packer {
      * Gets the field value converted to the specified type.
      */
     fun <T> getValue(cls: Class<T>): T?
+
+    /**
+     * Serializes the field into its binary representation.
+     */
+    fun pack(): ByteArray
+    /**
+     * Deserializes the field from its binary representation.
+     *
+     * @return the number of read bytes
+     */
+    fun unpack(bytes: ByteArray): Int
 
     /**
      * Creates a copy of the field.
@@ -89,6 +99,11 @@ class IsoFieldDeserializer : StdDeserializer<IsoField>(IsoField::class.java) {
             "Binary.LLL" to BinaryVarPrefixer(3),
             "Binary.LLLL" to BinaryVarPrefixer(4),
             "Hex.Fixed" to HexFixedPrefixer(),
+            "BCD.Fixed" to BcdFixedPrefixer(),
+            "BCD.L" to BcdVarPrefixer(1),
+            "BCD.LL" to BcdVarPrefixer(2),
+            "BCD.LLL" to BcdVarPrefixer(3),
+            "BCD.LLLL" to BcdVarPrefixer(4)
         )
 
         private val padders: Map<String, (Char?) -> Padder> = mapOf(

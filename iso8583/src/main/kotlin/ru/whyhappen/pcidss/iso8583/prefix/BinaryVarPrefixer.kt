@@ -6,21 +6,21 @@ import java.nio.ByteOrder
 /**
  * [Prefixer] that encodes field length as an integer.
  */
-class BinaryVarPrefixer(override val bytesSize: Int) : Prefixer {
+class BinaryVarPrefixer(override val digits: Int) : Prefixer {
     override fun encodeLength(maxLen: Int, dataLen: Int): ByteArray {
         checkPrefixer(maxLen >= dataLen) { "Field length $dataLen is greater than maximum $maxLen" }
 
         val bytes = intToBytes(dataLen)
-        return adjustBytesLength(bytes, bytesSize)
+        return adjustBytesLength(bytes, digits)
     }
 
     override fun decodeLength(maxLen: Int, data: ByteArray): Pair<Int, Int> {
-        checkPrefixer(data.size >= bytesSize) { "Not enough data ${data.size} to read $bytesSize byte digits" }
+        checkPrefixer(data.size >= digits) { "Not enough data ${data.size} to read $digits bytes" }
 
-        val bytes = data.sliceArray(0 until bytesSize)
-        val result = bytesToInt(bytes)
-        checkPrefixer(result <= maxLen) { "Data length $result is greater than maximum $maxLen" }
-        return result to bytesSize
+        val bytes = data.sliceArray(0 until digits)
+        val dataLen = bytesToInt(bytes)
+        checkPrefixer(dataLen <= maxLen) { "Data length $dataLen is greater than maximum $maxLen" }
+        return dataLen to digits
     }
 
     private fun intToBytes(n: Int): ByteArray {

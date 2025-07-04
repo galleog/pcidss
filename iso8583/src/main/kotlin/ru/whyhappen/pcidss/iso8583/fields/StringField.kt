@@ -13,10 +13,6 @@ class StringField(value: String? = null, spec: Spec) :
     override val valueType = TypeDescriptor.valueOf(String::class.java)
 
     override fun copyOf(): StringField = StringField(innerValue, spec)
-
-    override fun reset() {
-        innerValue = null
-    }
 }
 
 class StringConversionService : GenericConversionService() {

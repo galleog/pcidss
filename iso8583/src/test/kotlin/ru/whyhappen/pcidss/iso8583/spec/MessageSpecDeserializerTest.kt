@@ -6,6 +6,7 @@ import io.kotest.matchers.maps.shouldMatchExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
+import org.springframework.core.io.ClassPathResource
 import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
 import ru.whyhappen.pcidss.iso8583.encode.BytesToAsciiHexEncoder
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
@@ -77,11 +78,20 @@ class MessageSpecDeserializerTest {
                         description shouldBe "Primary Account Number"
                         encoder.shouldBeInstanceOf<AsciiEncoder>()
                         prefixer.shouldBeInstanceOf<AsciiVarPrefixer>()
-                        prefixer.bytesSize shouldBe 2
+                        prefixer.digits shouldBe 2
                         padder.shouldBeNull()
                     }
                 }
             )
+        }
+    }
+
+    @Test
+    fun `should deserialize JSON with specification ISO 8583 v1987`() {
+        val resource = ClassPathResource("spec87ascii.json")
+        resource.inputStream.use {
+            val spec = objectMapper.readValue(it, MessageSpec::class.java)
+            spec.fields shouldHaveSize 66
         }
     }
 

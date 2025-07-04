@@ -14,10 +14,6 @@ class NumericField(value: BigInteger? = null, spec: Spec) :
     override val valueType: TypeDescriptor = TypeDescriptor.valueOf(BigInteger::class.java)
 
     override fun copyOf(): NumericField = NumericField(innerValue, spec)
-
-    override fun reset() {
-        innerValue = null
-    }
 }
 
 class BigIntegerConversionService : GenericConversionService() {
@@ -69,11 +65,11 @@ class BigIntegerConversionService : GenericConversionService() {
         override fun convert(source: Int): BigInteger = source.toBigInteger()
     }
 
-    class BigIntegerToLongConverter: Converter<BigInteger, Long?> {
+    class BigIntegerToLongConverter : Converter<BigInteger, Long?> {
         override fun convert(source: BigInteger): Long = source.longValueExact()
     }
 
-    class LongToBigIntegerConverter: Converter<Long, BigInteger> {
+    class LongToBigIntegerConverter : Converter<Long, BigInteger> {
         override fun convert(source: Long): BigInteger = source.toBigInteger()
     }
 }

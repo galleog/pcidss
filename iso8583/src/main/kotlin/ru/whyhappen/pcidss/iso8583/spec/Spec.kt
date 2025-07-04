@@ -34,5 +34,9 @@ data class Spec(
     /**
      * [Padder] sets the padding direction and type of the field.
      */
-    val padder: Padder? = null
+    val padder: Padder? = null,
+    /**
+     * Packs/unpacks the field value according to its spec.
+     */
+    val packer: Packer = DefaultPacker(length, encoder, prefixer, padder)
 )

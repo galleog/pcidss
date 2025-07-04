@@ -28,7 +28,7 @@ abstract class AbstractIsoField<V : Any>(
 ) : IsoField {
     protected val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
-    /*
+    /**
      * Type of the field value.
      */
     protected abstract val valueType: TypeDescriptor
@@ -57,33 +57,19 @@ abstract class AbstractIsoField<V : Any>(
 
     override fun pack(): ByteArray {
         logger.debug("Packing field using {}", spec)
-
-        // pad the value if needed
-        val paddedValue = spec.padder?.run { pad(bytes, spec.length) } ?: bytes
-
-        // encode the value
-        val encodedValue = spec.encoder.encode(paddedValue)
-        // encode the length
-        val lengthPrefix = spec.prefixer.encodeLength(spec.length, paddedValue.size)
-        return lengthPrefix + encodedValue
+        return spec.packer.pack(bytes)
     }
 
     override fun unpack(bytes: ByteArray): Int {
         logger.debug("Unpacking field using {}", spec)
 
-        // get the field length
-        val (dataLen, prefBytes) = spec.prefixer.decodeLength(spec.length, bytes)
-        // decode the byte array
-        val (decodedValue, read) = spec.encoder.decode(
-            bytes.sliceArray(spec.prefixer.bytesSize until bytes.size),
-            dataLen
-        )
+        val (value, read) = spec.packer.unpack(bytes)
+        setValue(value)
+        return read
+    }
 
-        // unpad the value if needed
-        val unpaddedValue = spec.padder?.run { unpad(decodedValue) } ?: decodedValue
-        setValue(unpaddedValue)
-
-        return prefBytes + read
+    override fun reset() {
+        innerValue = null
     }
 
     override fun toString(): String {

@@ -63,7 +63,7 @@ class IsoFieldDeserializerTest {
             description shouldBe "Without padding"
             encoder.shouldBeInstanceOf<BinaryEncoder>()
             prefixer.shouldBeInstanceOf<BinaryVarPrefixer>()
-            prefixer.bytesSize shouldBe 2
+            prefixer.digits shouldBe 2
             padder.shouldBeNull()
         }
     }
