@@ -3,8 +3,8 @@ package ru.whyhappen.pcidss.iso8583.fields
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
-import ru.whyhappen.pcidss.iso8583.prefix.BinaryFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.encode.Encoders
+import ru.whyhappen.pcidss.iso8583.prefix.Binary
 import ru.whyhappen.pcidss.iso8583.prefix.PrefixerException
 import ru.whyhappen.pcidss.iso8583.spec.Spec
 import kotlin.test.BeforeTest
@@ -14,13 +14,11 @@ import kotlin.test.Test
  * Tests for [BinaryField]
  */
 class BinaryFieldTest {
-    private val encoder = BinaryEncoder()
-    private val prefixer = BinaryFixedPrefixer()
     private lateinit var field: IsoField
 
     @BeforeTest
     fun setUp() {
-        field = BinaryField(spec = Spec(5, "Test", encoder, prefixer))
+        field = BinaryField(spec = Spec(5, "Test", Encoders.binary, Binary.fixed))
     }
 
     @Test

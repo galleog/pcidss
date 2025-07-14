@@ -12,7 +12,7 @@ import ru.whyhappen.pcidss.iso8583.prefix.Prefixer
  * the length of the encoded data instead. This is often necessary when using BCD or HEX encoding,
  * where the field value's length differs from the encoded field value's length.
  */
-class DefaultPacker(
+data class DefaultPacker(
     private val length: Int,
     private val encoder: Encoder,
     private val prefixer: Prefixer,

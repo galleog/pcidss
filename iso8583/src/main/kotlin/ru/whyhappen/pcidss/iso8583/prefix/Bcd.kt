@@ -5,6 +5,24 @@ import ru.whyhappen.pcidss.iso8583.utils.fromBcdToInt
 import ru.whyhappen.pcidss.iso8583.utils.toBcd
 
 /**
+ * Prefixers that uses BCD (Binary-Coded Decimal) encoding to encode field length
+ */
+object Bcd {
+    val fixed = BcdFixedPrefixer()
+    val L = BcdVarPrefixer(1)
+    val LL = BcdVarPrefixer(2)
+    val LLL = BcdVarPrefixer(3)
+    val LLLL = BcdVarPrefixer(4)
+    val LLLLL = BcdVarPrefixer(5)
+    val LLLLLL = BcdVarPrefixer(6)
+}
+
+/**
+ * BCD [Prefixer] for fields of fixed length.
+ */
+class BcdFixedPrefixer : FixedPrefixer()
+
+/**
  * [Prefixer] that uses BCD (Binary-Coded Decimal) encoding to encode field length.
  */
 class BcdVarPrefixer(override val digits: Int) : Prefixer {
@@ -31,4 +49,6 @@ class BcdVarPrefixer(override val digits: Int) : Prefixer {
         checkPrefixer(dataLen <= maxLen) { "Data length $dataLen is greater than maximum $maxLen" }
         return dataLen to length
     }
+
+    override fun toString(): String = "BcdVarPrefixer($digits)"
 }

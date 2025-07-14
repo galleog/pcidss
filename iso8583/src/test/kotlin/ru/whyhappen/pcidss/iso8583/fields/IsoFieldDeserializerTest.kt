@@ -26,7 +26,7 @@ class IsoFieldDeserializerTest {
             "length": 10,
             "description":"With padding",
             "enc":"ASCII",
-            "prefix":"ASCII.Fixed",
+            "prefix":"ASCII.fixed",
             "padding":{
                 "type":"Start",
                 "pad":48
@@ -84,7 +84,7 @@ class IsoFieldDeserializerTest {
             "length": 10,
             "description":"Test",
             "enc":"ASCII",
-            "prefix":"ASCII.Fixed"
+            "prefix":"ASCII.fixed"
         }""".trimIndent()
 
         shouldThrow<InvalidFormatException> {
@@ -128,7 +128,7 @@ class IsoFieldDeserializerTest {
             "length":10,
             "description":"Test",
             "enc":{},
-            "prefix":"ASCII.Fixed"
+            "prefix":"ASCII.fixed"
         }""".trimIndent()
 
         shouldThrow<InvalidFormatException> {
@@ -157,7 +157,7 @@ class IsoFieldDeserializerTest {
             "length": 10,
             "description":"Test",
             "enc":"ASCII",
-            "prefix":"ASCII.Fixed",
+            "prefix":"ASCII.fixed",
             "padding":{}
         }""".trimIndent()
 
@@ -173,7 +173,7 @@ class IsoFieldDeserializerTest {
             "length": 10,
             "description":"Test",
             "enc":"ASCII",
-            "prefix":"ASCII.Fixed",
+            "prefix":"ASCII.fixed",
             "padding":{
                 "type":"End",
                 "pad":"0"
@@ -192,7 +192,7 @@ class IsoFieldDeserializerTest {
             "length": 10,
             "description":"Test",
             "enc":"ASCII",
-            "prefix":"ASCII.Fixed",
+            "prefix":"ASCII.fixed",
             "padding":{
                 "type":"End"
             }

@@ -6,10 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import com.fasterxml.jackson.databind.exc.InvalidFormatException
-import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
-import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
-import ru.whyhappen.pcidss.iso8583.encode.BytesToAsciiHexEncoder
 import ru.whyhappen.pcidss.iso8583.encode.Encoder
+import ru.whyhappen.pcidss.iso8583.encode.Encoders
 import ru.whyhappen.pcidss.iso8583.pad.EndPadder
 import ru.whyhappen.pcidss.iso8583.pad.NoOpPadder
 import ru.whyhappen.pcidss.iso8583.pad.Padder
@@ -81,29 +79,30 @@ class IsoFieldDeserializer : StdDeserializer<IsoField>(IsoField::class.java) {
         )
 
         private val encoders: Map<String, Encoder> = mapOf(
-            "ASCII" to AsciiEncoder(),
-            "Binary" to BinaryEncoder(),
-            "HexToASCII" to BytesToAsciiHexEncoder(),
+            "ASCII" to Encoders.ascii,
+            "Binary" to Encoders.binary,
+            "HexToASCII" to Encoders.hexToAscii,
+            "ASCIIToHex" to Encoders.asciiToHex
         )
 
         private val prefixers: Map<String, Prefixer> = mapOf(
-            "NoOp.Fixed" to NoOpPrefixer(),
-            "ASCII.Fixed" to AsciiFixedPrefixer(),
-            "ASCII.L" to AsciiVarPrefixer(1),
-            "ASCII.LL" to AsciiVarPrefixer(2),
-            "ASCII.LLL" to AsciiVarPrefixer(3),
-            "ASCII.LLLL" to AsciiVarPrefixer(4),
-            "Binary.Fixed" to BinaryFixedPrefixer(),
-            "Binary.L" to BinaryVarPrefixer(1),
-            "Binary.LL" to BinaryVarPrefixer(2),
-            "Binary.LLL" to BinaryVarPrefixer(3),
-            "Binary.LLLL" to BinaryVarPrefixer(4),
-            "Hex.Fixed" to HexFixedPrefixer(),
-            "BCD.Fixed" to BcdFixedPrefixer(),
-            "BCD.L" to BcdVarPrefixer(1),
-            "BCD.LL" to BcdVarPrefixer(2),
-            "BCD.LLL" to BcdVarPrefixer(3),
-            "BCD.LLLL" to BcdVarPrefixer(4)
+            "NoOp.fixed" to NoOp.fixed,
+            "ASCII.fixed" to Ascii.fixed,
+            "ASCII.L" to Ascii.L,
+            "ASCII.LL" to Ascii.LL,
+            "ASCII.LLL" to Ascii.LLL,
+            "ASCII.LLLL" to Ascii.LLLL,
+            "Binary.fixed" to Binary.fixed,
+            "Binary.L" to Binary.L,
+            "Binary.LL" to Binary.LL,
+            "Binary.LLL" to Binary.LLL,
+            "Binary.LLLL" to Binary.LLLL,
+            "Hex.fixed" to Hex.fixed,
+            "BCD.fixed" to Bcd.fixed,
+            "BCD.L" to Bcd.L,
+            "BCD.LL" to Bcd.LL,
+            "BCD.LLL" to Bcd.LLL,
+            "BCD.LLLL" to Bcd.LLLL,
         )
 
         private val padders: Map<String, (Char?) -> Padder> = mapOf(

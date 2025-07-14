@@ -34,4 +34,6 @@ class BytesToAsciiHexEncoder : Encoder {
             .substring(0 until read)
         return slice.hexToByteArray() to read
     }
+
+    override fun toString(): String = "BytesToAsciiHexEncoder"
 }

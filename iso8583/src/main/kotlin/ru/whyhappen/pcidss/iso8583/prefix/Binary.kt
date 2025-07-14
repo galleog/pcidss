@@ -4,6 +4,24 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 /**
+ * Binary prefixers.
+ */
+object Binary {
+    val fixed = BinaryFixedPrefixer()
+    val L = BinaryVarPrefixer(1)
+    val LL = BinaryVarPrefixer(2)
+    val LLL = BinaryVarPrefixer(3)
+    val LLLL = BinaryVarPrefixer(4)
+    val LLLLL = BinaryVarPrefixer(5)
+    val LLLLLL = BinaryVarPrefixer(6)
+}
+
+/**
+ * [Prefixer] for binary fields of fixed length.
+ */
+class BinaryFixedPrefixer : FixedPrefixer()
+
+/**
  * [Prefixer] that encodes field length as an integer.
  */
 class BinaryVarPrefixer(override val digits: Int) : Prefixer {
@@ -22,6 +40,8 @@ class BinaryVarPrefixer(override val digits: Int) : Prefixer {
         checkPrefixer(dataLen <= maxLen) { "Data length $dataLen is greater than maximum $maxLen" }
         return dataLen to digits
     }
+
+    override fun toString(): String = "BinaryVarPrefixer($digits)"
 
     private fun intToBytes(n: Int): ByteArray {
         checkPrefixer(n >= 0) { "Value must be non-negative" }

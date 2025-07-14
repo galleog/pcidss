@@ -12,4 +12,6 @@ abstract class FixedPrefixer : Prefixer {
     }
 
     override fun decodeLength(maxLen: Int, data: ByteArray): Pair<Int, Int> = maxLen to 0
+
+    override fun toString(): String = this::class.simpleName!!
 }

@@ -12,4 +12,6 @@ class BinaryEncoder : Encoder {
 
         return data.sliceArray(0 until length) to length
     }
+
+    override fun toString(): String = "BinaryEncoder"
 }

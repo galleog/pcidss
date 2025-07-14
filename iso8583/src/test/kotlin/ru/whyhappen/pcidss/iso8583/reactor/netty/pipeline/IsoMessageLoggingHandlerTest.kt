@@ -11,13 +11,13 @@ import org.junit.jupiter.api.extension.ExtendWith
 import ru.whyhappen.pcidss.iso8583.DefaultIsoMessage
 import ru.whyhappen.pcidss.iso8583.IsoMessage
 import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
-import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
+import ru.whyhappen.pcidss.iso8583.encode.Encoders
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
 import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.pad.StartPadder
 import ru.whyhappen.pcidss.iso8583.prefix.AsciiFixedPrefixer
 import ru.whyhappen.pcidss.iso8583.prefix.AsciiVarPrefixer
-import ru.whyhappen.pcidss.iso8583.prefix.BinaryFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.prefix.Binary
 import ru.whyhappen.pcidss.iso8583.reactor.netty.pipeline.IsoMessageLoggingHandler.Companion.MASKED_VALUE
 import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
 import ru.whyhappen.pcidss.iso8583.spec.Spec
@@ -57,8 +57,8 @@ class IsoMessageLoggingHandlerTest {
             Spec(
                 8,
                 "Bitmap",
-                BinaryEncoder(),
-                BinaryFixedPrefixer()
+                Encoders.binary,
+                Binary.fixed
             )
         ),
         2 to StringField(

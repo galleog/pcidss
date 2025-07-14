@@ -11,16 +11,16 @@ import kotlin.test.Test
 /**
  * Tests for [BcdVarPrefixer].
  */
-class BcdVarPrefixerTest {
+class BCDTest {
     companion object {
         @JvmStatic
         private fun testData() = Stream.of(
-            Arguments.of(BcdVarPrefixer(1), 1, 5, 3, byteArrayOf(0x03)),
-            Arguments.of(BcdVarPrefixer(2), 1, 20, 2, byteArrayOf(0x02)),
-            Arguments.of(BcdVarPrefixer(2), 1, 20, 12, byteArrayOf(0x12)),
-            Arguments.of(BcdVarPrefixer(3), 2, 340, 2, byteArrayOf(0x00, 0x02)),
-            Arguments.of(BcdVarPrefixer(3), 2, 340, 200, byteArrayOf(0x02, 0x00)),
-            Arguments.of(BcdVarPrefixer(4), 2, 9999, 1234, byteArrayOf(0x12, 0x34))
+            Arguments.of(Bcd.L, 1, 5, 3, byteArrayOf(0x03)),
+            Arguments.of(Bcd.LL, 1, 20, 2, byteArrayOf(0x02)),
+            Arguments.of(Bcd.LL, 1, 20, 12, byteArrayOf(0x12)),
+            Arguments.of(Bcd.LLL, 2, 340, 2, byteArrayOf(0x00, 0x02)),
+            Arguments.of(Bcd.LLL, 2, 340, 200, byteArrayOf(0x02, 0x00)),
+            Arguments.of(Bcd.LLLL, 2, 9999, 1234, byteArrayOf(0x12, 0x34))
         )
     }
 
@@ -39,21 +39,21 @@ class BcdVarPrefixerTest {
     @Test
     fun `should fail if dataLen exceeds maxLen`() {
         shouldThrow<PrefixerException> {
-            BcdVarPrefixer(2).encodeLength(20, 22)
+            Bcd.LL.encodeLength(20, 22)
         }
     }
 
     @Test
     fun `should fail if number of digits in dataLen exceeds number of digits in prefixer`() {
         shouldThrow<PrefixerException> {
-            BcdVarPrefixer(2).encodeLength(999, 123)
+            Bcd.LL.encodeLength(999, 123)
         }
     }
 
     @Test
     fun `should fail if not enough data to read length prefix`() {
         shouldThrow<PrefixerException> {
-            BcdVarPrefixer(3).decodeLength(20, byteArrayOf(0x22))
+            Bcd.LLL.decodeLength(20, byteArrayOf(0x22))
         }
     }
 }

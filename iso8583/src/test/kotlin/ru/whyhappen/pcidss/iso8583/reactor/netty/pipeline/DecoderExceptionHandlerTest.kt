@@ -18,17 +18,17 @@ import ru.whyhappen.pcidss.iso8583.DefaultMessageFactory
 import ru.whyhappen.pcidss.iso8583.IsoMessage
 import ru.whyhappen.pcidss.iso8583.MessageFactory
 import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
-import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
 import ru.whyhappen.pcidss.iso8583.encode.EncoderException
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.ascii
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.binary
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
 import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
 import ru.whyhappen.pcidss.iso8583.mti.MessageClass
 import ru.whyhappen.pcidss.iso8583.mti.MessageFunction
 import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
-import ru.whyhappen.pcidss.iso8583.prefix.AsciiFixedPrefixer
-import ru.whyhappen.pcidss.iso8583.prefix.AsciiVarPrefixer
-import ru.whyhappen.pcidss.iso8583.prefix.BinaryFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.prefix.Ascii
+import ru.whyhappen.pcidss.iso8583.prefix.Binary
 import ru.whyhappen.pcidss.iso8583.reactor.DefaultTcpTestHelper
 import ru.whyhappen.pcidss.iso8583.reactor.TcpTestHelper
 import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.IsoMessageHandler
@@ -58,16 +58,16 @@ class DecoderExceptionHandlerTest : TcpTestHelper by DefaultTcpTestHelper() {
                     spec = Spec(
                         4,
                         "Message Type Indicator",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 1 to Bitmap(
                     Spec(
                         8,
                         "Bitmap",
-                        BinaryEncoder(),
-                        BinaryFixedPrefixer()
+                        binary,
+                        Binary.fixed
                     )
                 ),
                 2 to StringField(
@@ -75,55 +75,55 @@ class DecoderExceptionHandlerTest : TcpTestHelper by DefaultTcpTestHelper() {
                         19,
                         "Primary Account Number",
                         encoder,
-                        AsciiVarPrefixer(2)
+                        Ascii.LL
                     )
                 ),
                 7 to StringField(
                     spec = Spec(
                         10,
                         "Transmission Date & Time",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 11 to StringField(
                     spec = Spec(
                         6,
                         "Systems Trace Audit Number (STAN)",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 12 to StringField(
                     spec = Spec(
                         6,
                         "Local Transaction Time",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 13 to StringField(
                     spec = Spec(
                         4,
                         "Local Transaction Date",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 24 to StringField(
                     spec = Spec(
                         3,
                         "Function Code",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 44 to StringField(
                     spec = Spec(
                         99,
                         "Additional Data",
-                        AsciiEncoder(),
-                        AsciiVarPrefixer(2)
+                        ascii,
+                        Ascii.LL
                     )
                 )
             )

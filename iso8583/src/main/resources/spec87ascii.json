@@ -4,14 +4,14 @@
     "length": 4,
     "description": "Message Type Indicator",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "1": {
     "type": "Bitmap",
     "length": 16,
     "description": "Bitmap",
     "enc": "HexToASCII",
-    "prefix": "Hex.Fixed"
+    "prefix": "Hex.fixed"
   },
   "2": {
     "type": "String",
@@ -25,7 +25,7 @@
     "length": 6,
     "description": "Processing Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed",
+    "prefix": "ASCII.fixed",
     "padding": {
       "type": "Start",
       "pad": 48
@@ -36,7 +36,7 @@
     "length": 12,
     "description": "Transaction Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed",
+    "prefix": "ASCII.fixed",
     "padding": {
       "type": "Start",
       "pad": 48
@@ -47,7 +47,7 @@
     "length": 12,
     "description": "Settlement Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed",
+    "prefix": "ASCII.fixed",
     "padding": {
       "type": "Start",
       "pad": 48
@@ -58,7 +58,7 @@
     "length": 12,
     "description": "Billing Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed",
+    "prefix": "ASCII.fixed",
     "padding": {
       "type": "Start",
       "pad": 48
@@ -69,175 +69,175 @@
     "length": 10,
     "description": "Transmission Date & Time",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "8": {
     "type": "String",
     "length": 8,
     "description": "Billing Fee Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "9": {
     "type": "String",
     "length": 8,
     "description": "Settlement Conversion Rate",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "10": {
     "type": "String",
     "length": 8,
     "description": "Cardholder Billing Conversion Rate",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "11": {
     "type": "String",
     "length": 6,
     "description": "Systems Trace Audit Number (STAN)",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "12": {
     "type": "String",
     "length": 6,
     "description": "Local Transaction Time",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "13": {
     "type": "String",
     "length": 4,
     "description": "Local Transaction Date",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "14": {
     "type": "String",
     "length": 4,
     "description": "Expiration Date",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "15": {
     "type": "String",
     "length": 4,
     "description": "Settlement Date",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "16": {
     "type": "String",
     "length": 4,
     "description": "Currency Conversion Date",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "17": {
     "type": "String",
     "length": 4,
     "description": "Capture Date",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "18": {
     "type": "String",
     "length": 4,
     "description": "Merchant Type",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "19": {
     "type": "String",
     "length": 3,
     "description": "Acquiring Institution Country Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "20": {
     "type": "String",
     "length": 3,
     "description": "PAN Extended Country Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "21": {
     "type": "String",
     "length": 3,
     "description": "Forwarding Institution Country Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "22": {
     "type": "String",
     "length": 3,
     "description": "Point of Sale (POS) Entry Mode",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "23": {
     "type": "String",
     "length": 3,
     "description": "Card Sequence Number (CSN)",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "24": {
     "type": "String",
     "length": 3,
     "description": "Function Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "25": {
     "type": "String",
     "length": 2,
     "description": "Point of Service Condition Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "26": {
     "type": "String",
     "length": 2,
     "description": "Point of Service PIN Capture Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "27": {
     "type": "String",
     "length": 1,
     "description": "Authorizing Identification Response Length",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "28": {
     "type": "String",
     "length": 9,
     "description": "Transaction Fee Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "29": {
     "type": "String",
     "length": 9,
     "description": "Settlement Fee Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "30": {
     "type": "String",
     "length": 9,
     "description": "Transaction Processing Fee Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "31": {
     "type": "String",
     "length": 9,
     "description": "Settlement Processing Fee Amount",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "32": {
     "type": "String",
@@ -279,49 +279,49 @@
     "length": 12,
     "description": "Retrieval Reference Number",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "38": {
     "type": "String",
     "length": 6,
     "description": "Authorization Identification Response",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "39": {
     "type": "String",
     "length": 2,
     "description": "Response Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "40": {
     "type": "String",
     "length": 3,
     "description": "Service Restriction Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "41": {
     "type": "String",
     "length": 8,
     "description": "Card Acceptor Terminal Identification",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "42": {
     "type": "String",
     "length": 15,
     "description": "Card Acceptor Identification Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "43": {
     "type": "String",
     "length": 40,
     "description": "Card Acceptor Name/Location",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "44": {
     "type": "String",
@@ -363,35 +363,35 @@
     "length": 3,
     "description": "Transaction Currency Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "50": {
     "type": "String",
     "length": 3,
     "description": "Settlement Currency Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "51": {
     "type": "String",
     "length": 3,
     "description": "Cardholder Billing Currency Code",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "52": {
     "type": "String",
     "length": 8,
     "description": "PIN Data",
     "enc": "HexToASCII",
-    "prefix": "Hex.Fixed"
+    "prefix": "Hex.fixed"
   },
   "53": {
     "type": "String",
     "length": 16,
     "description": "Security Related Control Information",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   },
   "54": {
     "type": "String",
@@ -468,13 +468,13 @@
     "length": 8,
     "description": "Message Authentication Code (MAC)",
     "enc": "HexToASCII",
-    "prefix": "Hex.Fixed"
+    "prefix": "Hex.fixed"
   },
   "90": {
     "type": "String",
     "length": 42,
     "description": "Original Data Elements",
     "enc": "ASCII",
-    "prefix": "ASCII.Fixed"
+    "prefix": "ASCII.fixed"
   }
 }

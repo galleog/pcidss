@@ -11,20 +11,20 @@ import kotlin.test.Test
 /**
  * Tests for [BinaryVarPrefixer].
  */
-class BinaryVarPrefixerTest {
+class BinaryTest {
     companion object {
         @JvmStatic
         private fun testEncodeData() = Stream.of(
-            Arguments.of(BinaryVarPrefixer(1), 32, 24, byteArrayOf(0x18)),
-            Arguments.of(BinaryVarPrefixer(2), 512, 256, byteArrayOf(0x01, 0x00)),
+            Arguments.of(Binary.L, 32, 24, byteArrayOf(0x18)),
+            Arguments.of(Binary.LL, 512, 256, byteArrayOf(0x01, 0x00)),
             Arguments.of(
-                BinaryVarPrefixer(3),
+                Binary.LLL,
                 19999999,
                 11258879,
                 byteArrayOf(0xAB.toByte(), 0xCB.toByte(), 0xFF.toByte())
             ),
             Arguments.of(
-                BinaryVarPrefixer(6),
+                Binary.LLLLLL,
                 2147483647,
                 40976,
                 byteArrayOf(0x00, 0x00, 0x00, 0x00, 0xA0.toByte(), 0x10)
@@ -33,16 +33,16 @@ class BinaryVarPrefixerTest {
 
         @JvmStatic
         private fun testDecodeData() = Stream.of(
-            Arguments.of(BinaryVarPrefixer(1), 32, 24, byteArrayOf(0x18, 0x23, 0x11, 0xAD.toByte())),
-            Arguments.of(BinaryVarPrefixer(2), 512, 256, byteArrayOf(0x01, 0x00, 0x45, 0x00)),
+            Arguments.of(Binary.L, 32, 24, byteArrayOf(0x18, 0x23, 0x11, 0xAD.toByte())),
+            Arguments.of(Binary.LL, 512, 256, byteArrayOf(0x01, 0x00, 0x45, 0x00)),
             Arguments.of(
-                BinaryVarPrefixer(3),
+                Binary.LLL,
                 19999999,
                 11258879,
                 byteArrayOf(0xAB.toByte(), 0xCB.toByte(), 0xFF.toByte(), 0x00)
             ),
             Arguments.of(
-                BinaryVarPrefixer(6),
+                Binary.LLLLLL,
                 2147483647,
                 40976,
                 byteArrayOf(0x00, 0x00, 0x00, 0x00, 0xA0.toByte(), 0x10, 0xAB.toByte(), 0xCB.toByte(), 0xFF.toByte())
@@ -65,35 +65,35 @@ class BinaryVarPrefixerTest {
     @Test
     fun `should fail to encode length if data length exceeds maximum`() {
         shouldThrow<PrefixerException> {
-            BinaryVarPrefixer(1).encodeLength(16, 24)
+            Binary.L.encodeLength(16, 24)
         }
     }
 
     @Test
     fun `should fail to decode length if data length exceeds maximal possible length`() {
         shouldThrow<PrefixerException> {
-            BinaryVarPrefixer(1).encodeLength(512, 256)
+            Binary.L.encodeLength(512, 256)
         }
     }
 
     @Test
     fun `should fail to decode length if not enough data to decode`() {
         shouldThrow<PrefixerException> {
-            BinaryVarPrefixer(3).decodeLength(32, byteArrayOf(0x00))
+            Binary.LLL.decodeLength(32, byteArrayOf(0x00))
         }
     }
 
     @Test
     fun `should fail to decode length if data length exceeds maximum`() {
         shouldThrow<PrefixerException> {
-            BinaryVarPrefixer(1).decodeLength(8, byteArrayOf(0x18))
+            Binary.L.decodeLength(8, byteArrayOf(0x18))
         }
     }
 
     @Test
     fun `should fail to decode length if encoded length exceeds 4 bytes`() {
         shouldThrow<PrefixerException> {
-            BinaryVarPrefixer(5).decodeLength(Int.MAX_VALUE, byteArrayOf(0x01, 0x00, 0x00, 0x00, 0x00))
+            Binary.LLLLL.decodeLength(Int.MAX_VALUE, byteArrayOf(0x01, 0x00, 0x00, 0x00, 0x00))
         }
     }
 }

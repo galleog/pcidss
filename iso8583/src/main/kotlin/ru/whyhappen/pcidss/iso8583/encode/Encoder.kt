@@ -36,3 +36,13 @@ inline fun checkEncoder(value: Boolean, lazyMessage: () -> String) {
 
     if (!value) throw EncoderException(lazyMessage())
 }
+
+/**
+ * All encoders.
+ */
+object Encoders {
+    val ascii = AsciiEncoder()
+    val binary = BinaryEncoder()
+    val hexToAscii = BytesToAsciiHexEncoder()
+    val asciiToHex = AsciiHexToBytesEncoder()
+}

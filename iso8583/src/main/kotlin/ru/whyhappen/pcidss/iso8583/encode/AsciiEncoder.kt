@@ -24,4 +24,6 @@ class AsciiEncoder : Encoder {
 
         return result to length
     }
+
+    override fun toString(): String = "AsciiEncoder"
 }

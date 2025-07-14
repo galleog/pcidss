@@ -7,4 +7,6 @@ class NoOpPadder : Padder {
     override fun pad(bytes: ByteArray, length: Int): ByteArray = bytes
 
     override fun unpad(bytes: ByteArray): ByteArray = bytes
+
+    override fun toString(): String = "NoOpPadder"
 }

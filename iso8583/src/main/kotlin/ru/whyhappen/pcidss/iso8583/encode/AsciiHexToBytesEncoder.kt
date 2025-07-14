@@ -28,4 +28,6 @@ class AsciiHexToBytesEncoder : Encoder {
             .toByteArray(Charsets.US_ASCII)
         return decodedValue to length
     }
+
+    override fun toString(): String = "AsciiHexToBytesEncoder"
 }

@@ -1,6 +1,13 @@
 package ru.whyhappen.pcidss.iso8583.prefix
 
 /**
+ * HEX prefixers.
+ */
+object Hex {
+    val fixed = HexFixedPrefixer()
+}
+
+/**
  * [Prefixer] for hex-encoded fields of fixed length.
  */
 class HexFixedPrefixer : FixedPrefixer() {

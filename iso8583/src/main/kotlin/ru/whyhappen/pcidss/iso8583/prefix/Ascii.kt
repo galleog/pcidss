@@ -1,6 +1,24 @@
 package ru.whyhappen.pcidss.iso8583.prefix
 
 /**
+ * Ascii prefixers.
+ */
+object Ascii {
+    val fixed = AsciiFixedPrefixer()
+    val L = AsciiVarPrefixer(1)
+    val LL = AsciiVarPrefixer(2)
+    val LLL = AsciiVarPrefixer(3)
+    val LLLL = AsciiVarPrefixer(4)
+    val LLLLL = AsciiVarPrefixer(5)
+    val LLLLLL = AsciiVarPrefixer(6)
+}
+
+/**
+ * [Prefixer] for ASCII string fields of fixed length.
+ */
+class AsciiFixedPrefixer : FixedPrefixer()
+
+/**
  * [Prefixer] that encodes field length as ASCII digits.
  */
 class AsciiVarPrefixer(override val digits: Int) : Prefixer {
@@ -21,4 +39,6 @@ class AsciiVarPrefixer(override val digits: Int) : Prefixer {
         checkPrefixer(maxLen >= result) { "Data length $result is greater than maximum $maxLen" }
         return result to digits
     }
+
+    override fun toString(): String = "AsciiVarPrefixer($digits)"
 }

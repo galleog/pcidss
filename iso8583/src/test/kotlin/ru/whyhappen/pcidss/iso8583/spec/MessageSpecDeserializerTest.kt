@@ -30,14 +30,14 @@ class MessageSpecDeserializerTest {
                 "length": 4,
                 "description": "Message Type Indicator",
                 "enc": "ASCII",
-                "prefix": "ASCII.Fixed"
+                "prefix": "ASCII.fixed"
             },
             "1": {
                 "type": "Bitmap",
                 "length": 8,
                 "description": "Bitmap",
                 "enc": "HexToASCII",
-                "prefix": "Hex.Fixed"
+                "prefix": "Hex.fixed"
             },
             "2": {
                 "type": "String",
@@ -103,14 +103,14 @@ class MessageSpecDeserializerTest {
                 "length": 4,
                 "description": "Message Type Indicator",
                 "enc": "ASCII",
-                "prefix": "ASCII.Fixed"
+                "prefix": "ASCII.fixed"
             },
             "1": {
                 "type": "Bitmap",
                 "length": 8,
                 "description": "Bitmap",
                 "enc": "HexToASCII",
-                "prefix": "Hex.Fixed"
+                "prefix": "Hex.fixed"
             },
             "invalid": {
             }

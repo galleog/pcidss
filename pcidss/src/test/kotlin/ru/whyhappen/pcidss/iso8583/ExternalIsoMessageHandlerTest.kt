@@ -17,8 +17,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
-import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
-import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.ascii
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.binary
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
 import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
@@ -26,9 +26,8 @@ import ru.whyhappen.pcidss.iso8583.mti.MessageClass
 import ru.whyhappen.pcidss.iso8583.mti.MessageFunction
 import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
 import ru.whyhappen.pcidss.iso8583.pad.StartPadder
-import ru.whyhappen.pcidss.iso8583.prefix.AsciiFixedPrefixer
-import ru.whyhappen.pcidss.iso8583.prefix.AsciiVarPrefixer
-import ru.whyhappen.pcidss.iso8583.prefix.BinaryFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.prefix.Ascii
+import ru.whyhappen.pcidss.iso8583.prefix.Binary
 import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
 import ru.whyhappen.pcidss.iso8583.spec.Spec
 import ru.whyhappen.pcidss.service.TokenService
@@ -54,32 +53,32 @@ class ExternalIsoMessageHandlerTest {
                     spec = Spec(
                         4,
                         "Message Type Indicator",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 1 to Bitmap(
                     Spec(
                         8,
                         "Bitmap",
-                        BinaryEncoder(),
-                        BinaryFixedPrefixer()
+                        binary,
+                        Binary.fixed
                     )
                 ),
                 2 to StringField(
                     spec = Spec(
                         19,
                         "Primary Account Number",
-                        AsciiEncoder(),
-                        AsciiVarPrefixer(2)
+                        ascii,
+                        Ascii.LL
                     )
                 ),
                 4 to StringField(
                     spec = Spec(
                         12,
                         "Transaction Amount",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer(),
+                        ascii,
+                        Ascii.fixed,
                         StartPadder('0')
                     )
                 ),
@@ -87,40 +86,40 @@ class ExternalIsoMessageHandlerTest {
                     spec = Spec(
                         10,
                         "Transmission Date & Time",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 11 to StringField(
                     spec = Spec(
                         6,
                         "Systems Trace Audit Number (STAN)",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 12 to StringField(
                     spec = Spec(
                         6,
                         "Local Transaction Time",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 34 to StringField(
                     spec = Spec(
                         28,
                         "Extended Primary Account Number",
-                        AsciiEncoder(),
-                        AsciiVarPrefixer(2)
+                        ascii,
+                        Ascii.LL
                     )
                 ),
                 39 to StringField(
                     spec = Spec(
                         2,
                         "Response Code",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 )
             )

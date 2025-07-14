@@ -9,16 +9,16 @@ import org.awaitility.kotlin.untilTrue
 import reactor.kotlin.core.publisher.cast
 import ru.whyhappen.pcidss.iso8583.DefaultMessageFactory
 import ru.whyhappen.pcidss.iso8583.IsoMessage
-import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
-import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.ascii
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.binary
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
 import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
 import ru.whyhappen.pcidss.iso8583.mti.MessageClass
 import ru.whyhappen.pcidss.iso8583.mti.MessageFunction
 import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
-import ru.whyhappen.pcidss.iso8583.prefix.AsciiFixedPrefixer
-import ru.whyhappen.pcidss.iso8583.prefix.BinaryFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.prefix.Ascii
+import ru.whyhappen.pcidss.iso8583.prefix.Binary
 import ru.whyhappen.pcidss.iso8583.reactor.DefaultTcpTestHelper
 import ru.whyhappen.pcidss.iso8583.reactor.TcpTestHelper
 import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.IsoMessageHandler
@@ -45,16 +45,16 @@ class ObservationHandlerTest : SampleTestRunner(), TcpTestHelper by DefaultTcpTe
                     spec = Spec(
                         4,
                         "Message Type Indicator",
-                        AsciiEncoder(),
-                        AsciiFixedPrefixer()
+                        ascii,
+                        Ascii.fixed
                     )
                 ),
                 1 to Bitmap(
                     Spec(
                         8,
                         "Bitmap",
-                        BinaryEncoder(),
-                        BinaryFixedPrefixer()
+                        binary,
+                        Binary.fixed
                     )
                 )
             )

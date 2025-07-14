@@ -9,7 +9,8 @@ import org.junit.jupiter.api.Nested
 import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
 import ru.whyhappen.pcidss.iso8583.encode.BytesToAsciiHexEncoder
 import ru.whyhappen.pcidss.iso8583.encode.EncoderException
-import ru.whyhappen.pcidss.iso8583.prefix.BinaryFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.encode.Encoders
+import ru.whyhappen.pcidss.iso8583.prefix.Binary
 import ru.whyhappen.pcidss.iso8583.prefix.HexFixedPrefixer
 import ru.whyhappen.pcidss.iso8583.spec.Spec
 import kotlin.test.BeforeTest
@@ -65,7 +66,7 @@ class BitmapTest {
     }
 
     private fun createBitmap(length: Int): Bitmap {
-        val spec = Spec(length, "Bitmap", BinaryEncoder(), BinaryFixedPrefixer())
+        val spec = Spec(length, "Bitmap", BinaryEncoder(), Binary.fixed)
         return Bitmap(spec)
     }
 
@@ -130,13 +131,11 @@ class BitmapTest {
 
     @Nested
     inner class BinaryBitmapTest {
-        private val encoder = BinaryEncoder()
-        private val prefixer = BinaryFixedPrefixer()
         private lateinit var bitmap: Bitmap
 
         @BeforeTest
         fun setup() {
-            val spec = Spec(8, "Bitmap", encoder, prefixer)
+            val spec = Spec(8, "Bitmap", Encoders.binary, Binary.fixed)
             bitmap = Bitmap(spec)
         }
 

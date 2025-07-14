@@ -3,7 +3,7 @@ package ru.whyhappen.pcidss.iso8583.pad
 /**
  * Base class for implementations of [Padder].
  */
-abstract class AbstractPadder(padChar: Char) : Padder {
+abstract class AbstractPadder(protected val padChar: Char) : Padder {
     internal val padBytes = padChar.toString().toByteArray(Charsets.UTF_8)
 
     /**
@@ -60,4 +60,6 @@ abstract class AbstractPadder(padChar: Char) : Padder {
 
         return true
     }
+
+    override fun toString(): String = "${this::class.simpleName!!}($padChar)"
 }

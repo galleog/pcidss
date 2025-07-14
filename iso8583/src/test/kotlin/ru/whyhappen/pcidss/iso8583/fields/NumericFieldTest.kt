@@ -2,9 +2,9 @@ package ru.whyhappen.pcidss.iso8583.fields
 
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import ru.whyhappen.pcidss.iso8583.encode.AsciiEncoder
+import ru.whyhappen.pcidss.iso8583.encode.Encoders
 import ru.whyhappen.pcidss.iso8583.pad.StartPadder
-import ru.whyhappen.pcidss.iso8583.prefix.AsciiFixedPrefixer
+import ru.whyhappen.pcidss.iso8583.prefix.Ascii
 import ru.whyhappen.pcidss.iso8583.spec.Spec
 import java.math.BigInteger
 import kotlin.test.BeforeTest
@@ -14,15 +14,13 @@ import kotlin.test.Test
  * Tests for [NumericField].
  */
 class NumericFieldTest {
-    private val encoder = AsciiEncoder()
-    private val prefixer = AsciiFixedPrefixer()
     private val padder = StartPadder('0')
 
     private lateinit var field: NumericField
 
     @BeforeTest
     fun setUp() {
-        field = NumericField(spec = Spec(10, "Test", encoder, prefixer, padder))
+        field = NumericField(spec = Spec(10, "Test", Encoders.ascii, Ascii.fixed, padder))
     }
 
     @Test
