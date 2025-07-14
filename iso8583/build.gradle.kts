@@ -19,9 +19,9 @@ dependencies {
     implementation("io.micrometer:micrometer-observation")
     implementation("io.micrometer:micrometer-tracing")
 
+    testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation("org.springframework:spring-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.junit.jupiter:junit-jupiter-params")
     testImplementation(libs.mockk)
     testImplementation("io.kotest:kotest-assertions-core")
     testImplementation("io.projectreactor:reactor-test")
