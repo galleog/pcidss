@@ -6,6 +6,7 @@ import ru.whyhappen.pcidss.iso8583.encode.Encoders.hexToAscii
 import ru.whyhappen.pcidss.iso8583.fields.BinaryField
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
 import ru.whyhappen.pcidss.iso8583.fields.StringField
+import ru.whyhappen.pcidss.iso8583.pad.StartPadder
 import ru.whyhappen.pcidss.iso8583.prefix.Ascii
 import ru.whyhappen.pcidss.iso8583.prefix.Binary
 import ru.whyhappen.pcidss.iso8583.prefix.Hex
@@ -55,7 +56,8 @@ object BpcMessageSpec {
                     length = 12,
                     description = "Amount, Transaction",
                     encoder = ascii,
-                    prefixer = Ascii.fixed
+                    prefixer = Ascii.fixed,
+                    padder = StartPadder('0')
                 )
             ),
             5 to StringField(
@@ -63,7 +65,8 @@ object BpcMessageSpec {
                     length = 12,
                     description = "Amount, Settlement",
                     encoder = ascii,
-                    prefixer = Ascii.fixed
+                    prefixer = Ascii.fixed,
+                    padder = StartPadder('0')
                 )
             ),
             6 to StringField(
@@ -71,7 +74,8 @@ object BpcMessageSpec {
                     length = 12,
                     description = "Amount, Cardholder Billing",
                     encoder = ascii,
-                    prefixer = Ascii.fixed
+                    prefixer = Ascii.fixed,
+                    padder = StartPadder('0')
                 )
             ),
             7 to StringField(

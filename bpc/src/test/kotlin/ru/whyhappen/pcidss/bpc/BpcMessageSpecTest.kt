@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvFileSource
 import ru.whyhappen.pcidss.iso8583.DefaultMessageFactory
 import ru.whyhappen.pcidss.iso8583.fields.BinaryField
+import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
 import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
 
@@ -37,10 +38,12 @@ class BpcMessageSpecTest {
             fields.keys shouldContainExactly ids
 
             for (id in ids) {
-                val expected = if (BpcMessageSpec.spec.fields[id] is BinaryField) {
-                    values[id.toString()].toString().uppercase()
-                } else {
-                    values[id.toString()].toString()
+                val field = BpcMessageSpec.spec.fields[id]
+                val value = values[id.toString()].toString()
+                val expected = when {
+                    field is BinaryField -> value.uppercase()
+                    field is StringField && field.spec.padder != null -> value.trimStart('0')
+                    else -> value
                 }
 
                 getFieldValue(id, String::class.java) shouldBe expected
