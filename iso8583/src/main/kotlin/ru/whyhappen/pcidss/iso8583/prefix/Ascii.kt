@@ -1,7 +1,7 @@
 package ru.whyhappen.pcidss.iso8583.prefix
 
 /**
- * Ascii prefixers.
+ * ASCII prefixers.
  */
 object Ascii {
     val fixed = AsciiFixedPrefixer()
