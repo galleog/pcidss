@@ -94,22 +94,6 @@ class DecoderExceptionHandlerTest : TcpTestHelper by DefaultTcpTestHelper() {
                         Ascii.fixed
                     )
                 ),
-                12 to StringField(
-                    spec = Spec(
-                        6,
-                        "Local Transaction Time",
-                        ascii,
-                        Ascii.fixed
-                    )
-                ),
-                13 to StringField(
-                    spec = Spec(
-                        4,
-                        "Local Transaction Date",
-                        ascii,
-                        Ascii.fixed
-                    )
-                ),
                 24 to StringField(
                     spec = Spec(
                         3,
@@ -167,11 +151,9 @@ class DecoderExceptionHandlerTest : TcpTestHelper by DefaultTcpTestHelper() {
 
         with(adminMessage.get()) {
             mti shouldBe 0x0644
-            fields.keys shouldContainExactly setOf(7, 11, 12, 13, 24, 44)
+            fields.keys shouldContainExactly setOf(7, 11, 24, 44)
             getFieldValue(7, String::class.java) shouldHaveLength 10
             getFieldValue(11, String::class.java) shouldHaveLength 6
-            getFieldValue(12, String::class.java) shouldHaveLength 6
-            getFieldValue(13, String::class.java) shouldHaveLength 4
             getFieldValue(24, String::class.java) shouldBe "650"
 
             val field44Value = getFieldValue(44, String::class.java)

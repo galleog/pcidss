@@ -9,7 +9,8 @@ import ru.whyhappen.pcidss.iso8583.MessageFactory
 import ru.whyhappen.pcidss.iso8583.fields.DateFormats
 import ru.whyhappen.pcidss.iso8583.mti.MessageClass
 import ru.whyhappen.pcidss.iso8583.mti.MessageFunction
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 /**
  * Sends heartbeats (administrative messages) when the channel becomes idle, i.e. `IdleStateEvent` is received.
@@ -36,12 +37,9 @@ open class IdleEventHandler(
             MessageClass.NETWORK_MANAGEMENT,
             MessageFunction.REQUEST
         ).apply {
-            val now = LocalDateTime.now()
+            val now = OffsetDateTime.now(ZoneOffset.UTC)
             setFieldValue(7, now.format(DateFormats.DATE10))
             setFieldValue(11, now.format(DateFormats.TIME))
-            setFieldValue(12, now.format(DateFormats.TIME))
-            setFieldValue(13, now.format(DateFormats.DATE4))
-
             setFieldValue(70, "301") // echo test
         }
 }

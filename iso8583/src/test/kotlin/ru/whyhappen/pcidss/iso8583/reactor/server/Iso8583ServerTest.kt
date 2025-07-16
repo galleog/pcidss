@@ -91,22 +91,6 @@ class Iso8583ServerTest : TcpTestHelper by DefaultTcpTestHelper() {
                         Ascii.fixed
                     )
                 ),
-                12 to StringField(
-                    spec = Spec(
-                        6,
-                        "Local Transaction Time",
-                        ascii,
-                        Ascii.fixed
-                    )
-                ),
-                13 to StringField(
-                    spec = Spec(
-                        4,
-                        "Local Transaction Date",
-                        ascii,
-                        Ascii.fixed
-                    )
-                ),
                 39 to StringField(
                     spec = Spec(
                         2,
@@ -202,11 +186,9 @@ class Iso8583ServerTest : TcpTestHelper by DefaultTcpTestHelper() {
 
         with(echoMessage.get()) {
             mti shouldBe 0x0800
-            fields.keys shouldContainExactly setOf(7, 11, 12, 13, 70)
+            fields.keys shouldContainExactly setOf(7, 11, 70)
             getFieldValue(7, String::class.java) shouldHaveLength 10
             getFieldValue(11, String::class.java) shouldHaveLength 6
-            getFieldValue(12, String::class.java) shouldHaveLength 6
-            getFieldValue(13, String::class.java) shouldHaveLength 4
             getFieldValue(70, String::class.java) shouldBe "301"
         }
     }

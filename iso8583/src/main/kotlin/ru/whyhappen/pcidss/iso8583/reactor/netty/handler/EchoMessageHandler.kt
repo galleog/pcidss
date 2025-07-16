@@ -2,9 +2,7 @@ package ru.whyhappen.pcidss.iso8583.reactor.netty.handler
 
 import ru.whyhappen.pcidss.iso8583.IsoMessage
 import ru.whyhappen.pcidss.iso8583.MessageFactory
-import ru.whyhappen.pcidss.iso8583.fields.DateFormats
 import ru.whyhappen.pcidss.iso8583.mti.MessageClass
-import java.time.LocalDateTime
 
 /**
  * Sends responses to incoming management messages.
@@ -20,7 +18,6 @@ open class EchoMessageHandler(
     override suspend fun onMessage(inbound: IsoMessage): IsoMessage? =
         isoMessageFactory.createResponse(inbound)
             .apply {
-                setFieldValue(7, LocalDateTime.now().format(DateFormats.DATE10))
                 setFieldValue(39, "00") // response code
             }
 }

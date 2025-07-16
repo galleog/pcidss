@@ -79,18 +79,16 @@ class IdleEventHandlerTest {
 
         verifyCount {
             1 * { messageFactory.newMessage(MessageClass.NETWORK_MANAGEMENT, MessageFunction.REQUEST) }
-            5 * { isoMessage.setFieldValue(capture(idLists), capture(valueList)) }
+            3 * { isoMessage.setFieldValue(capture(idLists), capture(valueList)) }
             1 * { ctx.writeAndFlush(capture(messageSlot)) }
         }
 
         messageSlot.captured.mti shouldBe MESSAGE_TYPE
-        idLists shouldContainExactly listOf(7, 11, 12, 13, 70)
-        valueList shouldHaveSize 5
+        idLists shouldContainExactly listOf(7, 11, 70)
+        valueList shouldHaveSize 3
         valueList.shouldMatchEach(
             { it shouldHaveLength 10 },
             { it shouldHaveLength 6 },
-            { it shouldHaveLength 6 },
-            { it shouldHaveLength 4 },
             { it shouldBe "301" }
         )
     }

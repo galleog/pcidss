@@ -10,7 +10,8 @@ import ru.whyhappen.pcidss.iso8583.fields.DateFormats
 import ru.whyhappen.pcidss.iso8583.mti.MessageClass
 import ru.whyhappen.pcidss.iso8583.mti.MessageFunction
 import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 
 /**
  * Handles [IsoMessageException]s and responds with an administrative message.
@@ -44,11 +45,9 @@ open class DecoderExceptionHandler(
             MessageFunction.NOTIFICATION,
             MessageOrigin.OTHER
         ).apply {
-            val now = LocalDateTime.now()
+            val now = OffsetDateTime.now(ZoneOffset.UTC)
             setFieldValue(7, now.format(DateFormats.DATE10))
             setFieldValue(11, now.format(DateFormats.TIME))
-            setFieldValue(12, now.format(DateFormats.TIME))
-            setFieldValue(13, now.format(DateFormats.DATE4))
 
             // 650 (Unable to parse the message)
             setFieldValue(24, "650")
