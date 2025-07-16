@@ -2,14 +2,12 @@ package ru.whyhappen.pcidss.bpc
 
 import ru.whyhappen.pcidss.iso8583.encode.Encoders.ascii
 import ru.whyhappen.pcidss.iso8583.encode.Encoders.binary
-import ru.whyhappen.pcidss.iso8583.encode.Encoders.hexToAscii
 import ru.whyhappen.pcidss.iso8583.fields.BinaryField
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
 import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.pad.StartPadder
 import ru.whyhappen.pcidss.iso8583.prefix.Ascii
 import ru.whyhappen.pcidss.iso8583.prefix.Binary
-import ru.whyhappen.pcidss.iso8583.prefix.Hex
 import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
 import ru.whyhappen.pcidss.iso8583.spec.Spec
 
@@ -446,12 +444,12 @@ object BpcMessageSpec {
                     prefixer = Ascii.LL
                 )
             ),
-            53 to StringField(
+            53 to BinaryField(
                 spec = Spec(
                     length = 16,
                     description = "Security Related Control Information",
-                    encoder = ascii,
-                    prefixer = Ascii.fixed
+                    encoder = binary,
+                    prefixer = Binary.fixed
                 )
             ),
             54 to StringField(
@@ -534,12 +532,12 @@ object BpcMessageSpec {
                     prefixer = Ascii.LLL
                 )
             ),
-            64 to StringField(
+            64 to BinaryField(
                 spec = Spec(
                     length = 8,
                     description = "Message Authentication Code (MAC)",
-                    encoder = hexToAscii,
-                    prefixer = Hex.fixed
+                    encoder = binary,
+                    prefixer = Binary.fixed
                 )
             ),
             66 to StringField(
@@ -782,12 +780,12 @@ object BpcMessageSpec {
                     prefixer = Ascii.fixed
                 )
             ),
-            96 to StringField(
+            96 to BinaryField(
                 spec = Spec(
                     length = 8,
                     description = "Message Security Code",
-                    encoder = ascii,
-                    prefixer = Ascii.fixed
+                    encoder = binary,
+                    prefixer = Binary.fixed
                 )
             ),
             97 to StringField(
@@ -1030,11 +1028,11 @@ object BpcMessageSpec {
                     prefixer = Ascii.LLL
                 )
             ),
-            127 to StringField(
+            127 to BinaryField(
                 spec = Spec(
                     length = 999999,
                     description = "Reserved (Private)",
-                    encoder = ascii,
+                    encoder = binary,
                     prefixer = Ascii.LLLLLL
                 )
             )
