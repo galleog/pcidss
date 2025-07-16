@@ -73,7 +73,7 @@ object Bcd {
 // extension functions for convenience
 fun String.toBcd(): ByteArray = Bcd.encode(this)
 fun Int.toBcd(): ByteArray = Bcd.encode(this.toString())
-fun ByteArray.fromBcd(): String = Bcd.decode(this)
+fun ByteArray.fromBcd(): String = Bcd.decode(this, false)
 fun ByteArray.fromBcdToInt(): Int {
     val decimalString = Bcd.decode(this)
     return decimalString.toInt()

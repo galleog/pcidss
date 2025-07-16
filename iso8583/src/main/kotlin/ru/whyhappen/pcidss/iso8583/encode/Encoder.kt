@@ -26,7 +26,7 @@ interface Encoder {
 /**
  * Exception thrown by [Encoder].
  */
-class EncoderException(message: String) : IsoException(message)
+class EncoderException(message: String, cause: Throwable? = null) : IsoException(message, cause)
 
 @OptIn(ExperimentalContracts::class)
 inline fun checkEncoder(value: Boolean, lazyMessage: () -> String) {
@@ -45,4 +45,5 @@ object Encoders {
     val binary = BinaryEncoder()
     val hexToAscii = BytesToAsciiHexEncoder()
     val asciiToHex = AsciiHexToBytesEncoder()
+    val bcd = BcdEncoder()
 }

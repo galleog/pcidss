@@ -32,8 +32,8 @@ class BcdTest {
         @JvmStatic
         private fun testDecodeToString() = Stream.of(
             Arguments.of(byteArrayOf(0x33), "33"),
-            Arguments.of(byteArrayOf(0x00, 0x00), "0"),
-            Arguments.of(byteArrayOf(0x00, 0x47), "47"),
+            Arguments.of(byteArrayOf(0x00, 0x00), "0000"),
+            Arguments.of(byteArrayOf(0x00, 0x47), "0047"),
             Arguments.of(byteArrayOf(0x50, 0x00), "5000"),
             Arguments.of(byteArrayOf(0x79, 0x02), "7902"),
         )
