@@ -39,4 +39,6 @@ class BcdEncoder : Encoder {
             .toByteArray(Charsets.US_ASCII)
         return decoded to read
     }
+
+    override fun toString(): String = "BcdEncoder"
 }
