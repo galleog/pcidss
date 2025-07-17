@@ -16,7 +16,7 @@ data class DefaultPacker(
     private val length: Int,
     private val encoder: Encoder,
     private val prefixer: Prefixer,
-    private val padder: Padder?
+    private val padder: Padder? = null
 ) : Packer {
     override fun pack(bytes: ByteArray): ByteArray {
         // pad the value if needed
@@ -36,7 +36,7 @@ data class DefaultPacker(
 
         // decode the byte array
         val (decodedValue, read) = encoder.decode(
-            bytes.sliceArray(prefixer.digits until bytes.size),
+            bytes.sliceArray(prefBytes until bytes.size),
             dataLen
         )
 

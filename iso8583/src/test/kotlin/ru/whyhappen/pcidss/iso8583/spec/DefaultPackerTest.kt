@@ -1,76 +1,98 @@
 package ru.whyhappen.pcidss.iso8583.spec
 
 import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.impl.annotations.MockK
-import io.mockk.junit5.MockKExtension
-import io.mockk.verifySequence
-import org.junit.jupiter.api.extension.ExtendWith
-import ru.whyhappen.pcidss.iso8583.encode.Encoder
-import ru.whyhappen.pcidss.iso8583.pad.Padder
-import ru.whyhappen.pcidss.iso8583.prefix.Prefixer
-import kotlin.test.BeforeTest
-import kotlin.test.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.ascii
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.bcd
+import ru.whyhappen.pcidss.iso8583.encode.Encoders.binary
+import ru.whyhappen.pcidss.iso8583.pad.StartPadder
+import ru.whyhappen.pcidss.iso8583.prefix.Ascii
+import ru.whyhappen.pcidss.iso8583.prefix.Bcd
+import ru.whyhappen.pcidss.iso8583.prefix.Binary
+import java.util.stream.Stream
 
 /**
  * Tests for [DefaultPacker].
  */
-@ExtendWith(MockKExtension::class)
 class DefaultPackerTest {
-    @MockK
-    private lateinit var encoder: Encoder
-    @MockK
-    private lateinit var prefixer: Prefixer
-    @MockK
-    private lateinit var padder: Padder
+    companion object {
+        @JvmStatic
+        private fun testPackData() = Stream.of(
+            Arguments.of(
+                DefaultPacker(4, ascii, Ascii.L),
+                "123".toByteArray(),
+                "3123".toByteArray()
+            ),
+            Arguments.of(
+                DefaultPacker(4, ascii, Ascii.fixed, StartPadder('0')),
+                "456".toByteArray(),
+                "0456".toByteArray()
+            ),
+            Arguments.of(
+                DefaultPacker(4, binary, Binary.L),
+                byteArrayOf(0x23, 0x72),
+                byteArrayOf(0x02, 0x23, 0x72)
+            ),
+            Arguments.of(
+                DefaultPacker(3, bcd, Bcd.L),
+                "123".toByteArray(),
+                byteArrayOf(0x03, 0x01, 0x23)
+            ),
+            Arguments.of(
+                DefaultPacker(4, bcd, Bcd.L),
+                "1234".toByteArray(),
+                byteArrayOf(0x04, 0x12, 0x34)
+            )
+        )
 
-    private lateinit var packer: Packer
-    private val length = 5
-
-    @BeforeTest
-    fun setUp() {
-        packer = DefaultPacker(length, encoder, prefixer, padder)
+        @JvmStatic
+        private fun testUnpackData() = Stream.of(
+            Arguments.of(
+                DefaultPacker(4, ascii, Ascii.L),
+                "31235".toByteArray(),
+                "123".toByteArray(),
+                4
+            ),
+            Arguments.of(
+                DefaultPacker(4, ascii, Ascii.fixed, StartPadder('0')),
+                "0456".toByteArray(),
+                "456".toByteArray(),
+                4
+            ),
+            Arguments.of(
+                DefaultPacker(4, binary, Binary.L),
+                byteArrayOf(0x02, 0x23, 0x72, 0xFF.toByte()),
+                byteArrayOf(0x23, 0x72),
+                3
+            ),
+            Arguments.of(
+                DefaultPacker(3, bcd, Bcd.L),
+                byteArrayOf(0x03, 0x01, 0x23),
+                "123".toByteArray(),
+                3
+            ),
+            Arguments.of(
+                DefaultPacker(4, bcd, Bcd.L),
+                byteArrayOf(0x04, 0x12, 0x34),
+                "1234".toByteArray(),
+                3
+            )
+        )
     }
 
-    @Test
-    fun `should pack bytes`() {
-        val bytes = byteArrayOf(0x12, 0xAA.toByte(), 0xBA.toByte())
-        val hex = "12AABA".toByteArray()
-        val lengthPrefix = "3".toByteArray()
-
-        every { padder.pad(any<ByteArray>(), length) } returns bytes
-        every { encoder.encode(any<ByteArray>()) } returns hex
-        every { prefixer.encodeLength(any<Int>(), any<Int>()) } returns lengthPrefix
-
-        packer.pack(bytes) shouldBe lengthPrefix + hex
-
-        verifySequence {
-            padder.pad(bytes, length)
-            encoder.encode(bytes)
-            prefixer.encodeLength(length, bytes.size)
-        }
+    @ParameterizedTest
+    @MethodSource("testPackData")
+    fun `should pack data`(packer: Packer, data: ByteArray, expected: ByteArray) {
+        packer.pack(data) shouldBe expected
     }
 
-    @Test
-    fun `should unpack bytes`() {
-        val bytes = byteArrayOf(0x12, 0xAA.toByte(), 0xBA.toByte())
-        val hex = "12AABA".toByteArray()
-        val lengthPrefix = "3".toByteArray()
-
-        every { prefixer.decodeLength(any<Int>(), any<ByteArray>()) } returns (3 to 1)
-        every { prefixer.digits } returns 1
-        every { encoder.decode(any<ByteArray>(), any<Int>()) } returns (bytes to 6)
-        every { padder.unpad(any<ByteArray>()) } returns bytes
-
-        val (value, read) = packer.unpack(lengthPrefix + hex)
-        value shouldBe bytes
-        read shouldBe 7
-
-        verifySequence {
-            prefixer.decodeLength(length, lengthPrefix + hex)
-            prefixer.digits
-            encoder.decode(hex, 3)
-            padder.unpad(bytes)
-        }
+    @ParameterizedTest
+    @MethodSource("testUnpackData")
+    fun `should unpack bytes`(packer: Packer, data: ByteArray, expectedBytes: ByteArray, expectedRead: Int) {
+        val (bytes, read) = packer.unpack(data)
+        bytes shouldBe expectedBytes
+        read shouldBe expectedRead
     }
 }
