@@ -25,7 +25,7 @@ class BcdEncoder : Encoder {
         val decodedLength = if (length % 2 == 0) length else length + 1
 
         // how many bytes we will read
-        val read = Bcd.encodeLen(decodedLength)
+        val read = Bcd.encodedLen(decodedLength)
         checkEncoder(read <= data.size) { "Not enough data ${data.size} to decode $read bytes" }
 
         val bytesToRead = data.sliceArray(0 until read)

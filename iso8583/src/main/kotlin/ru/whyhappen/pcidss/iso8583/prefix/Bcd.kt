@@ -36,7 +36,7 @@ class BcdVarPrefixer(override val digits: Int) : Prefixer {
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun decodeLength(maxLen: Int, data: ByteArray): Pair<Int, Int> {
-        val length = Bcd.encodeLen(digits)
+        val length = Bcd.encodedLen(digits)
         checkPrefixer(data.size >= length) { "Not enough data ${data.size} to read $length bytes" }
 
         val lengthPrefix = data.sliceArray(0 until length)

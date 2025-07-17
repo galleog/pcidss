@@ -20,7 +20,7 @@ object Bcd {
         // pad with leading zero if odd number of digits
         val paddedDecimal = if (decimal.length % 2 == 1) "0$decimal" else decimal
 
-        val result = ByteArray(encodeLen(paddedDecimal.length))
+        val result = ByteArray(encodedLen(paddedDecimal.length))
 
         for (i in paddedDecimal.indices step 2) {
             val highNibble = paddedDecimal[i].digitToInt()
@@ -67,7 +67,15 @@ object Bcd {
     /**
      * Returns amount of space needed to store bytes after encoding data of the specified length.
      */
-    fun encodeLen(length: Int): Int = (length + 1) / 2
+    fun encodedLen(length: Int): Int = (length + 1) / 2
+
+    /**
+     * Returns how much space is needed to store decoded string after decoding [length] bytes.
+     *
+     * It returns the max amount of possibly needed space because last octet may contain only one encoded digit.
+     * In that case the decoded length will be less by 1. For example, 4 octets may encode 7 or 8 digits.
+     */
+    fun decodedLen(length: Int): Int = length * 2
 }
 
 // extension functions for convenience
