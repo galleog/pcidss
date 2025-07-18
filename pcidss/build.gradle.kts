@@ -9,7 +9,6 @@ dependencies {
 
     implementation(project(":iso8583"))
     implementation(project(":iso8583-autoconfigure"))
-    implementation(project(":iso"))
     implementation(project(":bpc"))
     implementation(project(":way4"))
     implementation("org.springframework.boot:spring-boot-starter")
