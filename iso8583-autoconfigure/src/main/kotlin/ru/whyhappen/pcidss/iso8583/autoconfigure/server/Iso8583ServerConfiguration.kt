@@ -57,7 +57,7 @@ class Iso8583ServerConfiguration {
             messageFactory,
             messageHandlers.orderedStream().toList(),
             observationRegistry.ifAvailable ?: ObservationRegistry.NOOP,
-            exceptionHandler.ifAvailable ?: DefaultExceptionHandler(messageFactory, true),
+            exceptionHandler.ifAvailable ?: DefaultExceptionHandler(messageFactory),
             decoderExceptionHandler.ifAvailable ?: DecoderExceptionHandler(messageFactory, true),
             idleEventHandler.ifAvailable ?: IdleEventHandler(messageFactory)
         )

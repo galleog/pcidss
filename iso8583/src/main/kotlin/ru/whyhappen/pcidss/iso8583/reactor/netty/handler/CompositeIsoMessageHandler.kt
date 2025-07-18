@@ -51,7 +51,6 @@ class CompositeIsoMessageHandler(
                     runCatching {
                         response = handler.onMessage(message)
                     }.getOrElse { e ->
-                        logger.error("Error while handling {}", message, e)
                         response = exceptionHandler.handleException(message, e)
                     }
                 } else {
