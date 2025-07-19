@@ -42,7 +42,7 @@ class Iso8583AutoConfiguration {
         objectMapper: ObjectMapper,
         specs: ObjectProvider<MessageSpec>
     ): MessageSpec {
-        // merge all spec defined as beans
+        // merge all specs defined as beans
         val spec = specs.orderedStream()
             .reduce(IsoMessageSpec.spec) { a, b -> a + b }
 

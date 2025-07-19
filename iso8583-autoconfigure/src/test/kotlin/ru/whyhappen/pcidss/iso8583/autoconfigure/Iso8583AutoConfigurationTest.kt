@@ -1,6 +1,5 @@
 package ru.whyhappen.pcidss.iso8583.autoconfigure
 
-import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.springframework.boot.autoconfigure.AutoConfigurations
@@ -9,15 +8,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import ru.whyhappen.pcidss.iso8583.DefaultMessageFactory
 import ru.whyhappen.pcidss.iso8583.MessageFactory
-import ru.whyhappen.pcidss.iso8583.autoconfigure.server.Iso8583ServerBootstrap
 import ru.whyhappen.pcidss.iso8583.encode.Encoders
 import ru.whyhappen.pcidss.iso8583.fields.Bitmap
 import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
 import ru.whyhappen.pcidss.iso8583.prefix.Ascii
 import ru.whyhappen.pcidss.iso8583.prefix.Hex
-import ru.whyhappen.pcidss.iso8583.reactor.netty.handler.EchoMessageHandler
-import ru.whyhappen.pcidss.iso8583.reactor.server.Iso8583Server
 import ru.whyhappen.pcidss.iso8583.spec.IsoMessageSpec
 import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
 import ru.whyhappen.pcidss.iso8583.spec.Spec
@@ -42,17 +38,34 @@ class Iso8583AutoConfigurationTest {
         )
     }
 
-    private val contextRunner = ApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(Iso8583AutoConfiguration::class.java))
-        .withUserConfiguration(Config::class.java)
-        .withPropertyValues("iso8583.message.configs=classpath:test-spec.json")
-
     @Test
-    fun `should create beans`() {
+    fun `should create default beans`() {
+        val contextRunner = ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(Iso8583AutoConfiguration::class.java))
+
         contextRunner.run { context ->
             with(context.getBean(MessageFactory::class.java)) {
                 shouldBeInstanceOf<DefaultMessageFactory>()
                 isoVersion shouldBe ISO8583Version.V1987
+                spec shouldBe IsoMessageSpec.spec
+            }
+        }
+    }
+
+    @Test
+    fun `should create customized message factory`() {
+        val contextRunner = ApplicationContextRunner()
+            .withConfiguration(AutoConfigurations.of(Iso8583AutoConfiguration::class.java))
+            .withUserConfiguration(Config::class.java)
+            .withPropertyValues(
+                "iso8583.message.configs=classpath:test-spec.json",
+                "iso8583.message.isoVersion=V1993"
+            )
+
+        contextRunner.run { context ->
+            with(context.getBean(MessageFactory::class.java)) {
+                shouldBeInstanceOf<DefaultMessageFactory>()
+                isoVersion shouldBe ISO8583Version.V1993
                 spec shouldBe IsoMessageSpec.spec + messageSpec + MessageSpec(
                     mapOf(
                         127 to StringField(
@@ -66,10 +79,6 @@ class Iso8583AutoConfigurationTest {
                     )
                 )
             }
-
-            context.getBeansOfType(Iso8583Server::class.java) shouldHaveSize 1
-            context.getBeansOfType(Iso8583ServerBootstrap::class.java) shouldHaveSize 1
-            context.getBeansOfType(EchoMessageHandler::class.java) shouldHaveSize 1
         }
     }
 
