@@ -75,6 +75,24 @@ class Bitmap(override val spec: Spec) : IsoField {
         bytes = ByteArray(spec.length)
     }
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Bitmap
+
+        if (spec != other.spec) return false
+        if (!bytes.contentEquals(other.bytes)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = spec.hashCode()
+        result = 31 * result + bytes.contentHashCode()
+        return result
+    }
+
     override fun toString(): String = bytes.joinToString(" ") {
         Integer.toBinaryString(it.toInt() and 0xFF)
             .padStart(8, '0')

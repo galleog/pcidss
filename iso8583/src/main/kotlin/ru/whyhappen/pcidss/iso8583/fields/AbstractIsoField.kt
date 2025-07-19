@@ -45,7 +45,6 @@ abstract class AbstractIsoField<V : Any>(
         innerValue = converter.convert(value, valueType) as V
     }
 
-
     @Suppress("UNCHECKED_CAST")
     override fun <T> getValue(cls: Class<T>): T? {
         val typeDescriptor = TypeDescriptor.valueOf(cls)
@@ -70,6 +69,24 @@ abstract class AbstractIsoField<V : Any>(
 
     override fun reset() {
         innerValue = null
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as AbstractIsoField<*>
+
+        if (innerValue != other.innerValue) return false
+        if (spec != other.spec) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = innerValue?.hashCode() ?: 0
+        result = 31 * result + spec.hashCode()
+        return result
     }
 
     override fun toString(): String {
