@@ -1,4 +1,4 @@
-package ru.whyhappen.pcidss.bpc
+package ru.wayhappen.pcidss.way4
 
 import io.kotest.matchers.maps.shouldHaveSize
 import io.kotest.matchers.shouldBe
@@ -14,26 +14,26 @@ import ru.whyhappen.pcidss.iso8583.spec.IsoMessageSpec
 import kotlin.test.Test
 
 /**
- * Tests for [BpcAutoConfiguration].
+ * Tests for [Way4AutoConfiguration].
  */
-class BpcAutoConfigurationTest {
+class Way4AutoConfigurationTest {
     private val contextRunner = ApplicationContextRunner()
         .withConfiguration(
             AutoConfigurations.of(
                 Iso8583AutoConfiguration::class.java,
-                BpcAutoConfiguration::class.java
+                Way4AutoConfiguration::class.java
             )
-        ).withPropertyValues("iso8583.flavor=bpc", "iso8583.message.isoVersion=V1993")
+        ).withPropertyValues("iso8583.flavor=way4")
 
     @Test
-    fun `should customized BPC message factory`() {
+    fun `should use customized Way4 message factory`() {
         contextRunner.run { context ->
             context.getBeansOfType(Iso8583Server::class.java) shouldHaveSize 1
 
             with(context.getBean(MessageFactory::class.java)) {
                 shouldBeInstanceOf<DefaultMessageFactory>()
-                isoVersion shouldBe ISO8583Version.V1993
-                spec shouldBe IsoMessageSpec.spec + BpcMessageSpec.spec
+                isoVersion shouldBe ISO8583Version.V1987
+                spec shouldBe IsoMessageSpec.spec + Way4MessageSpec.spec
             }
         }
     }

@@ -18,5 +18,5 @@ import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
 class BpcAutoConfiguration {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    fun messageSpec(): MessageSpec = BpcMessageSpec.spec
+    fun bpcMessageSpec(): MessageSpec = BpcMessageSpec.spec
 }
