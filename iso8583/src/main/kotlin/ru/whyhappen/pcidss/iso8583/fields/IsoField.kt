@@ -82,7 +82,8 @@ class IsoFieldDeserializer : StdDeserializer<IsoField>(IsoField::class.java) {
             "ASCII" to Encoders.ascii,
             "Binary" to Encoders.binary,
             "HexToASCII" to Encoders.hexToAscii,
-            "ASCIIToHex" to Encoders.asciiToHex
+            "ASCIIToHex" to Encoders.asciiToHex,
+            "BCD" to Encoders.bcd
         )
 
         private val prefixers: Map<String, Prefixer> = mapOf(
@@ -102,7 +103,7 @@ class IsoFieldDeserializer : StdDeserializer<IsoField>(IsoField::class.java) {
             "BCD.L" to Bcd.L,
             "BCD.LL" to Bcd.LL,
             "BCD.LLL" to Bcd.LLL,
-            "BCD.LLLL" to Bcd.LLLL,
+            "BCD.LLLL" to Bcd.LLLL
         )
 
         private val padders: Map<String, (Char?) -> Padder> = mapOf(
