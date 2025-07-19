@@ -1,5 +1,8 @@
 package ru.whyhappen.pcidss.iso8583.autoconfigure
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -11,6 +14,7 @@ import ru.whyhappen.pcidss.iso8583.IsoMessage
 import ru.whyhappen.pcidss.iso8583.MessageFactory
 import ru.whyhappen.pcidss.iso8583.autoconfigure.server.Iso8583ServerConfiguration
 import ru.whyhappen.pcidss.iso8583.spec.IsoMessageSpec
+import ru.whyhappen.pcidss.iso8583.spec.JsonResourceMessageSpecBuilder
 import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
 
 /**
@@ -25,14 +29,27 @@ class Iso8583AutoConfiguration {
     @ConditionalOnMissingBean(MessageFactory::class)
     fun messageFactory(
         properties: Iso8583Properties,
-        spec: MessageSpec
+        objectMapper: ObjectProvider<ObjectMapper>,
+        specs: ObjectProvider<MessageSpec>
     ): MessageFactory<IsoMessage> = DefaultMessageFactory(
         properties.message.isoVersion,
         properties.message.role,
-        spec
+        createSpec(properties, objectMapper.ifAvailable ?: jacksonObjectMapper(), specs)
     )
 
-    @Bean
-    @ConditionalOnMissingBean(MessageSpec::class)
-    fun messageSpec(): MessageSpec = IsoMessageSpec.spec
+    private fun createSpec(
+        properties: Iso8583Properties,
+        objectMapper: ObjectMapper,
+        specs: ObjectProvider<MessageSpec>
+    ): MessageSpec {
+        // merge all spec defined as beans
+        val spec = specs.orderedStream()
+            .reduce(IsoMessageSpec.spec) { a, b -> a + b }
+
+        // add specs defined in JSON resources
+        return properties.message.configs
+            .fold(spec) { s, config ->
+                s + JsonResourceMessageSpecBuilder(objectMapper, config).build()
+            }
+    }
 }

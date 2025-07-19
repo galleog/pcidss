@@ -10,15 +10,15 @@ class DefaultMessageFactory(
     /**
      * ISO version of newly created messages.
      */
-    private val isoVersion: ISO8583Version = ISO8583Version.V1987,
+    val isoVersion: ISO8583Version = ISO8583Version.V1987,
     /**
      * Default role for new messages.
      */
-    private val role: MessageOrigin,
+    val role: MessageOrigin,
     /**
      * Message specification.
      */
-    internal val spec: MessageSpec
+    val spec: MessageSpec
 ) : MessageFactory<IsoMessage> {
     override fun newMessage(mti: Int): IsoMessage = DefaultIsoMessage(spec)
         .apply { this.mti = mti }

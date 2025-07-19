@@ -1,0 +1,9 @@
+{
+  "127": {
+    "type": "String",
+    "length": 999,
+    "description": "Reserved (Private)",
+    "enc": "ASCII",
+    "prefix": "ASCII.LLL"
+  }
+}
