@@ -1,5 +1,6 @@
 package ru.whyhappen.pcidss.iso8583.autoconfigure
 
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import org.springframework.boot.autoconfigure.AutoConfigurations
@@ -14,6 +15,7 @@ import ru.whyhappen.pcidss.iso8583.fields.StringField
 import ru.whyhappen.pcidss.iso8583.mti.ISO8583Version
 import ru.whyhappen.pcidss.iso8583.prefix.Ascii
 import ru.whyhappen.pcidss.iso8583.prefix.Hex
+import ru.whyhappen.pcidss.iso8583.reactor.server.Iso8583Server
 import ru.whyhappen.pcidss.iso8583.spec.IsoMessageSpec
 import ru.whyhappen.pcidss.iso8583.spec.MessageSpec
 import ru.whyhappen.pcidss.iso8583.spec.Spec
@@ -48,6 +50,10 @@ class Iso8583AutoConfigurationTest {
                 shouldBeInstanceOf<DefaultMessageFactory>()
                 isoVersion shouldBe ISO8583Version.V1987
                 spec shouldBe IsoMessageSpec.spec
+            }
+
+            with(context.getBean(Iso8583Server::class.java)) {
+                isStarted.shouldBeTrue()
             }
         }
     }
