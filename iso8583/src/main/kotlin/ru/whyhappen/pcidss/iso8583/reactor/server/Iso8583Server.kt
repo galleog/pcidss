@@ -24,7 +24,7 @@ class Iso8583Server(
     private val isoMessageFactory: MessageFactory<IsoMessage>,
     messageHandlers: List<IsoMessageHandler>,
     private val observationRegistry: ObservationRegistry,
-    exceptionHandler: ExceptionHandler = DefaultExceptionHandler(isoMessageFactory),
+    exceptionHandler: ExceptionHandler = DefaultExceptionHandler(isoMessageFactory, configuration.responseCode),
     private val decoderExceptionHandler: ChannelHandler = DecoderExceptionHandler(isoMessageFactory),
     private val idleEventHandler: ChannelHandler = IdleEventHandler(isoMessageFactory)
 ) {

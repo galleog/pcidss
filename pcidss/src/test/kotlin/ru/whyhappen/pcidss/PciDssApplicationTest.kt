@@ -1,6 +1,6 @@
 package ru.whyhappen.pcidss
 
-import io.kotest.matchers.shouldBe
+import io.kotest.matchers.booleans.shouldBeTrue
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -27,6 +27,6 @@ class PciDssApplicationTest {
 
     @Test
     fun `iso8583 server is running and properly configured`() {
-        server.isStarted shouldBe true
+        server.isStarted.shouldBeTrue()
     }
 }

@@ -11,6 +11,9 @@ import ru.whyhappen.pcidss.iso8583.mti.MessageOrigin
  *
  */
 interface MessageFactory<T> {
+    /**
+     * Creates a new message with the specified MTI.
+     */
     fun newMessage(mti: Int): T
 
     /**

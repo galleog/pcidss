@@ -41,6 +41,11 @@ const val DEFAULT_FRAME_LENGTH_FIELD_ADJUST = 0
 const val DEFAULT_FRAME_LENGTH_FIELD_OFFSET = 0
 
 /**
+ * Default value for the ISO field 39 'Response Code'.
+ */
+const val DEFAULT_RESPONSE_CODE = "00"
+
+/**
  * Abstract class representing the configuration for a connector.
  *
  * See [jreactive-iso8583](https://github.com/kpavlov/jreactive-8583).
@@ -109,6 +114,11 @@ abstract class ConnectorConfiguration protected constructor(
     val encodeFrameLengthAsString: Boolean
 
     /**
+     * Default value for the ISO field 39 'Response Code'.
+     */
+    val responseCode: String
+
+    /**
      * Indicates if [IdleEventHandler] should be added to the Netty pipeline.
      */
     fun shouldAddIdleEventHandler(): Boolean = addIdleEventHandler
@@ -151,6 +161,7 @@ abstract class ConnectorConfiguration protected constructor(
         this.maxFrameLength = b.maxFrameLength
         this.replyOnError = b.replyOnError
         this.sensitiveDataFields = b.sensitiveDataFields
+        this.responseCode = b.defaultResponseCode
     }
 
     @Suppress("UNCHECKED_CAST", "TooManyFunctions")
@@ -167,6 +178,7 @@ abstract class ConnectorConfiguration protected constructor(
         internal var frameLengthFieldOffset = DEFAULT_FRAME_LENGTH_FIELD_OFFSET
         internal var frameLengthFieldAdjust = DEFAULT_FRAME_LENGTH_FIELD_ADJUST
         internal var encodeFrameLengthAsString = false
+        internal var defaultResponseCode = DEFAULT_RESPONSE_CODE
 
         /**
          * @param shouldAddIdleEventHandler `true` to add [IdleEventHandler].
@@ -247,6 +259,11 @@ abstract class ConnectorConfiguration protected constructor(
         fun encodeFrameLengthAsString(encodeFrameLengthAsString: Boolean): B =
             apply {
                 this.encodeFrameLengthAsString = encodeFrameLengthAsString
+            } as B
+
+        fun responseCode(responseCode: String): B =
+            apply {
+                this.defaultResponseCode = responseCode
             } as B
     }
 }

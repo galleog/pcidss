@@ -101,6 +101,10 @@ data class Iso8583MessageProperties(
      */
     var role: MessageOrigin = MessageOrigin.ACQUIRER,
     /**
+     * Default value for the ISO field 39 'Response Code'.
+     */
+    var defaultResponseCode: String = "00",
+    /**
      * Resources to build the message spec. They are applied consecutively.
      */
     var configs: List<Resource> = emptyList(),

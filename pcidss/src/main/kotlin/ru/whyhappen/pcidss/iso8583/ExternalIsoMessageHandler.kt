@@ -31,6 +31,10 @@ class ExternalIsoMessageHandler(
      */
     private val webClient: WebClient,
     /**
+     * Default response code.
+     */
+    private val responseCode: String,
+    /**
      * Optional customizers for an ISO response message.
      */
     private val customizers: List<IsoMessageCustomizer> = emptyList()
@@ -80,6 +84,9 @@ class ExternalIsoMessageHandler(
                     logger.warn("Unknown response field {} with value {} for {}", key, value, response)
                 }
             }
+        }
+        if (!response.hasField(39)) {
+            response.setFieldValue(39, responseCode)
         }
 
         for (customizer in customizers) {

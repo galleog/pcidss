@@ -50,6 +50,7 @@ class PciDssConfiguration {
             messageFactory,
             tokenService,
             webClient,
+            properties.message.defaultResponseCode,
             customizers.orderedStream().toList()
         )
     }

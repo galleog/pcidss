@@ -183,7 +183,7 @@ class ExternalIsoMessageHandlerTest {
         coEvery { tokenService.getToken(requestMessage.getFieldValue(2, ByteArray::class.java)!!) } returns "token1"
         coEvery { tokenService.getToken(requestMessage.getFieldValue(34, ByteArray::class.java)!!) } returns "token2"
 
-        handler = ExternalIsoMessageHandler(listOf(2, 34), messageFactory, tokenService, webClient, listOf(customizer))
+        handler = ExternalIsoMessageHandler(listOf(2, 34), messageFactory, tokenService, webClient, "00", listOf(customizer))
 
         val responseMessage = handler.onMessage(requestMessage)
         with(responseMessage) {

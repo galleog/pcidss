@@ -9,7 +9,8 @@ import ru.whyhappen.pcidss.iso8583.MessageFactory
  * Exception handler that returns successful response.
  */
 open class DefaultExceptionHandler(
-    protected val isoMessageFactory: MessageFactory<IsoMessage>
+    protected val isoMessageFactory: MessageFactory<IsoMessage>,
+    protected val responseCode: String
 ) : ExceptionHandler {
     protected val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
@@ -18,7 +19,7 @@ open class DefaultExceptionHandler(
 
         return isoMessageFactory.createResponse(message)
             .apply {
-                setFieldValue(39, "00") // successful response code
+                setFieldValue(39, responseCode) // successful response code
             }
     }
 }
