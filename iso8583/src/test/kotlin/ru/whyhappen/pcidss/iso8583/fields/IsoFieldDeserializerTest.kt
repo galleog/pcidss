@@ -11,6 +11,8 @@ import ru.whyhappen.pcidss.iso8583.encode.BinaryEncoder
 import ru.whyhappen.pcidss.iso8583.pad.StartPadder
 import ru.whyhappen.pcidss.iso8583.prefix.AsciiFixedPrefixer
 import ru.whyhappen.pcidss.iso8583.prefix.BinaryVarPrefixer
+import ru.whyhappen.pcidss.iso8583.spec.DefaultPacker
+import ru.whyhappen.pcidss.iso8583.spec.HexPacker
 import kotlin.test.Test
 
 /**
@@ -30,7 +32,8 @@ class IsoFieldDeserializerTest {
             "padding":{
                 "type":"Start",
                 "pad":48
-            }
+            },
+            "packer":"Hex"
         }""".trimIndent()
 
         val field = objectMapper.readValue(json, IsoField::class.java)
@@ -43,11 +46,12 @@ class IsoFieldDeserializerTest {
             prefixer.shouldBeInstanceOf<AsciiFixedPrefixer>()
             padder.shouldBeInstanceOf<StartPadder>()
             padder.padBytes shouldBe byteArrayOf(48)
+            packer.shouldBeInstanceOf<HexPacker>()
         }
     }
 
     @Test
-    fun `should deserialize JSON without padding`() {
+    fun `should deserialize JSON without padding and packer`() {
         val json = """{
             "type":"Binary",
             "length": 99,
@@ -65,6 +69,7 @@ class IsoFieldDeserializerTest {
             prefixer.shouldBeInstanceOf<BinaryVarPrefixer>()
             prefixer.digits shouldBe 2
             padder.shouldBeNull()
+            packer.shouldBeInstanceOf<DefaultPacker>()
         }
     }
 
@@ -199,6 +204,22 @@ class IsoFieldDeserializerTest {
         }""".trimIndent()
 
         shouldThrow<IllegalStateException> {
+            objectMapper.readValue(json, IsoField::class.java)
+        }
+    }
+
+    @Test
+    fun `should fail to serialize JSON with invalid property 'packer'`() {
+        val json = """{
+            "type":"String",
+            "length": 10,
+            "description":"Test",
+            "enc":"ASCII",
+            "prefix":"ASCII.fixed",
+            "packer":"Invalid"
+        }""".trimIndent()
+
+        shouldThrow<InvalidFormatException> {
             objectMapper.readValue(json, IsoField::class.java)
         }
     }

@@ -13,6 +13,9 @@ import ru.whyhappen.pcidss.iso8583.pad.NoOpPadder
 import ru.whyhappen.pcidss.iso8583.pad.Padder
 import ru.whyhappen.pcidss.iso8583.pad.StartPadder
 import ru.whyhappen.pcidss.iso8583.prefix.*
+import ru.whyhappen.pcidss.iso8583.spec.DefaultPacker
+import ru.whyhappen.pcidss.iso8583.spec.HexPacker
+import ru.whyhappen.pcidss.iso8583.spec.Packer
 import ru.whyhappen.pcidss.iso8583.spec.Spec
 import java.math.BigInteger
 import kotlin.contracts.ExperimentalContracts
@@ -117,6 +120,11 @@ class IsoFieldDeserializer : StdDeserializer<IsoField>(IsoField::class.java) {
             },
             "NoOp" to { NoOpPadder() }
         )
+
+        private val packers: Map<String, (Int, Encoder, Prefixer, Padder?) -> Packer> = mapOf(
+            "Default" to { length, encoder, prefixer, padder -> DefaultPacker(length, encoder, prefixer, padder) },
+            "Hex" to { length, encoder, prefixer, padder -> HexPacker(length, encoder, prefixer, padder) }
+        )
     }
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): IsoField {
@@ -128,8 +136,9 @@ class IsoFieldDeserializer : StdDeserializer<IsoField>(IsoField::class.java) {
         val encoder = toInstance(p, node.get("enc"), encoders, "enc")
         val prefixer = toInstance(p, node.get("prefix"), prefixers, "prefix")
         val padder = padder(p, node.get("padding"))
+        val packer = packer(p, node.get("packer"), length, encoder, prefixer, padder)
 
-        return fieldCreator(Spec(length, description, encoder, prefixer, padder))
+        return fieldCreator(Spec(length, description, encoder, prefixer, padder, packer))
     }
 
     private fun <T : Any> toInstance(p: JsonParser, node: JsonNode?, map: Map<String, T>, field: String): T {
@@ -172,6 +181,27 @@ class IsoFieldDeserializer : StdDeserializer<IsoField>(IsoField::class.java) {
 
         checkNode(p, node, String::class.java, node.isInt) { "Field 'pad' must be an integer" }
         return node.intValue().toChar()
+    }
+
+    private fun packer(
+        p: JsonParser,
+        node: JsonNode?,
+        length: Int,
+        encoder: Encoder,
+        prefixer: Prefixer,
+        padder: Padder?
+    ): Packer {
+        if (node == null) return DefaultPacker(length, encoder, prefixer, padder)
+
+        checkNode(p, node, String::class.java, node.isTextual) { "Field 'packer' must be a string" }
+
+        val packerCreator = packers[node.textValue()] ?: throw InvalidFormatException.from(
+            p,
+            "Invalid packer type: ${node.textValue()}",
+            node,
+            String::class.java
+        )
+        return packerCreator(length, encoder, prefixer, padder)
     }
 }
 
