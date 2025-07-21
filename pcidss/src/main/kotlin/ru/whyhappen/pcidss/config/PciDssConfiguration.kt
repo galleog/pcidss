@@ -1,7 +1,6 @@
 package ru.whyhappen.pcidss.config
 
 import org.springframework.beans.factory.ObjectProvider
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.Ordered
@@ -36,7 +35,6 @@ class PciDssConfiguration {
     ): TokenService = RedisTokenService(redisTemplate, keyRepository, encryptor)
 
     @Bean
-    @ConditionalOnBean(WebClient::class)
     @Order(Ordered.LOWEST_PRECEDENCE)
     fun generalIsoMessageHandler(
         properties: Iso8583Properties,

@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient
 @Configuration(proxyBeanMethods = false)
 class WebClientConfiguration {
     @Bean
-    fun webClient(builder: WebClient.Builder, @Value("antifraud.base-url") baseUrl: String) =
+    fun webClient(builder: WebClient.Builder, @Value("\${antifraud.base-url}") baseUrl: String) =
         builder.baseUrl(baseUrl)
             .build()
 }
