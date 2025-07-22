@@ -1,6 +1,7 @@
 iso8583:
-  flavor: iso
+  flavor: bpc
 
-  message:
-    configs:
-      - classpath:spec87ascii.json
+  connection:
+    addLoggingHandler: true
+    logFieldDescription: true
+    defaultResponseCode: 000

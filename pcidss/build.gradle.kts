@@ -30,10 +30,12 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    testImplementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     testImplementation(libs.mockk)
     testImplementation("io.kotest:kotest-assertions-core")
     testImplementation(libs.mockwebserver)
     testImplementation(libs.jsonpathkt)
+    testImplementation(libs.awaitility.kotlin)
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("com.redis:testcontainers-redis")
 
