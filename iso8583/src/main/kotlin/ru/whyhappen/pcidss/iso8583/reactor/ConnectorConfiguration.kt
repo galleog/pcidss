@@ -119,6 +119,11 @@ abstract class ConnectorConfiguration protected constructor(
     val responseCode: String
 
     /**
+     * Indicates if wire logger should be enabled.
+     */
+    val addWireLogging: Boolean
+
+    /**
      * Indicates if [IdleEventHandler] should be added to the Netty pipeline.
      */
     fun shouldAddIdleEventHandler(): Boolean = addIdleEventHandler
@@ -162,6 +167,7 @@ abstract class ConnectorConfiguration protected constructor(
         this.replyOnError = b.replyOnError
         this.sensitiveDataFields = b.sensitiveDataFields
         this.responseCode = b.defaultResponseCode
+        this.addWireLogging = b.addWireLogging
     }
 
     @Suppress("UNCHECKED_CAST", "TooManyFunctions")
@@ -179,6 +185,7 @@ abstract class ConnectorConfiguration protected constructor(
         internal var frameLengthFieldAdjust = DEFAULT_FRAME_LENGTH_FIELD_ADJUST
         internal var encodeFrameLengthAsString = false
         internal var defaultResponseCode = DEFAULT_RESPONSE_CODE
+        internal var addWireLogging = false
 
         /**
          * @param shouldAddIdleEventHandler `true` to add [IdleEventHandler].
@@ -264,6 +271,11 @@ abstract class ConnectorConfiguration protected constructor(
         fun responseCode(responseCode: String): B =
             apply {
                 this.defaultResponseCode = responseCode
+            } as B
+
+        fun addWireLogging(wiretap: Boolean = true): B =
+            apply {
+                this.addWireLogging = wiretap
             } as B
     }
 }

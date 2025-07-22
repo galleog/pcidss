@@ -85,7 +85,11 @@ data class ConnectionProperties(
     /**
      * Indicates if field names should be logged.
      */
-    var logFieldDescription: Boolean = false
+    var logFieldDescription: Boolean = false,
+    /**
+     * Indicates if wire logger should be enabled.
+     */
+    val addWireLogging: Boolean = false
 )
 
 /**

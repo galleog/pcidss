@@ -46,6 +46,7 @@ class Iso8583ServerConfiguration {
             .idleTimeout(properties.connection.idleTimeout)
             .replyOnError(properties.connection.replyOnError)
             .addLoggingHandler(properties.connection.addLoggingHandler)
+            .addWireLogging(properties.connection.addWireLogging)
             .logSensitiveData(properties.connection.logSensitiveData)
             .sensitiveDataFields(*properties.message.sensitiveDataFields.toIntArray())
             .describeFieldsInLog(properties.connection.logFieldDescription)

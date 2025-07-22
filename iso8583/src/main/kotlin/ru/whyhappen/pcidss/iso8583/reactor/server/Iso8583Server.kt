@@ -46,7 +46,6 @@ class Iso8583Server(
         if (disposableServer == null) {
             runCatching {
                 disposableServer = tcpServer.bindNow()
-                tcpServer
             }.onSuccess { server ->
                 logger.info("Netty started on port {}", port)
             }.onFailure { e ->
@@ -68,6 +67,7 @@ class Iso8583Server(
 
     private fun createTcpServer(): TcpServer {
         return TcpServer.create()
+            .wiretap(configuration.addWireLogging)
             .port(port)
             .doOnChannelInit(
                 Iso8583ChannelInitializer(
