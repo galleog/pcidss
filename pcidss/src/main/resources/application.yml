@@ -1,6 +1,6 @@
 spring:
   application:
-    name: pcidss-poc
+    name: pcidss
 
   data:
     redis:
