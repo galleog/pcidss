@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/antifraud"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "39": "000"
+    }
+  }
+}

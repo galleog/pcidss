@@ -83,8 +83,6 @@ class PciDssApplicationTest {
     @OptIn(ExperimentalStdlibApi::class)
     @Test
     fun `should handle a message`() {
-        val response = AtomicReference<IsoMessage>()
-
         val mockResponse = """{
                 "39": "000"
             }""".trimIndent()
@@ -121,6 +119,8 @@ class PciDssApplicationTest {
                 "333938" + // 49 Currency Code, Transaction
                 "383430" + // 51 Currency Code, Cardholder Billing
                 "303430303031" // 100 Receiving Institution Identification Code
+
+        val response = AtomicReference<IsoMessage>()
         val connection = createClient(messageFactory) { inbound, outbound ->
             inbound.receiveObject()
                 .cast<IsoMessage>()

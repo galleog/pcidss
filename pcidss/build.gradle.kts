@@ -1,6 +1,9 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id("ru.whyhappen.pcidss.gradle.kotlin")
     alias(libs.plugins.spring.boot)
+    distribution
 }
 
 dependencies {
@@ -39,6 +42,27 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("com.redis:testcontainers-redis")
 
+    developmentOnly(platform(libs.spring.boot.bom))
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+}
+
+distributions {
+    main {
+        contents {
+            from(layout.projectDirectory.file(project.name)) {
+                filter(
+                    ReplaceTokens::class,
+                    "tokens" to mapOf("JAR_NAME" to tasks.bootJar.get().archiveFileName.get())
+                )
+                into("bin")
+            }
+            from(tasks.bootJar) {
+                into("libs")
+            }
+            from(parent!!.layout.projectDirectory.dir("conf").file("config.yml")) {
+                into("conf")
+            }
+        }
+    }
 }

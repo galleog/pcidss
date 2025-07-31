@@ -1,5 +1,12 @@
 services:
   redis:
-    image: 'redis:latest'
+    image: 'redis:alpine'
     ports:
-      - '6379'
+      - '6379:6379'
+
+  wiremock:
+    image: 'wiremock/wiremock:latest-alpine'
+    ports:
+      - '8383:8080'
+    volumes:
+      - ./wiremock:/home/wiremock

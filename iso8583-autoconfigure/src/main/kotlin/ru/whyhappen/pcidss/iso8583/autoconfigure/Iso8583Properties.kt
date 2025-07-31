@@ -109,7 +109,7 @@ data class Iso8583MessageProperties(
      */
     var defaultResponseCode: String = "00",
     /**
-     * Resources to build the message spec. They are applied consecutively.
+     * Additional resources to build the message spec. They are applied consecutively.
      */
     var configs: List<Resource> = emptyList(),
     /**

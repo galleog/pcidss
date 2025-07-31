@@ -1,0 +1,99 @@
+# file contains various options to configure the application.
+# Some of them are Spring-specific: 'spring.data', 'logging'
+# 3(see more in https://docs.spring.io/spring-boot/appendix/application-properties/index.html),
+# others are application-specific.
+
+spring:
+  data:
+    redis:
+      # Connection URL to Redis
+      url: redis://localhost:6379
+
+iso8583:
+  # ISO8583 flavor to use: `bpc` or `way4`. Omit the property to use standard ISO
+#  flavor:
+
+  connection:
+    # Connection port
+    port: 9876
+    # Maximal length of the TCP frame
+    maxFrameLength: 8192
+    # Length of TCP frame length field
+    frameLengthFieldLength: 2
+    # Offset of the length field
+    frameLengthFieldOffset: 0
+    # Compensation value to add to the value of the length field
+    frameLengthFieldAdjust: 0
+    # If `true` then the length header is to be encoded as a string, as opposed to the default binary
+    encodeFrameLengthAsString: false
+    # Indicates if management messages should be sent if connection is idle
+    addIdleEventHandler: false
+    # Timeout between heartbeats in seconds
+    idleTimeout: 30
+    # Indicates if a reply with an administrative message should be sent in case of message syntax errors
+    replyOnError: false
+    # Indicates if messages should be logged
+    addLoggingHandler: false
+    # Indicates if sensitive data specified in 'sensitiveDataFields' should be masked in the log
+    logSensitiveData: false
+    # Indicates if field names should be logged
+    logFieldDescription: false
+    # Indicates if wire logger should be enabled
+    addWireLogging: false
+
+  message:
+    # ISO8583 version
+    isoVersion: V1987
+    # Role of the communicating party
+    role: ACQUIRER
+    # Default value for the ISO field 39 'Response Code'
+    defaultResponseCode: '00'
+    # Additional resources to build the message spec. They are applied consecutively
+    configs: []
+    # List of ISO8583 sensitive field numbers to be masked and encoded
+    sensitiveDataFields:
+      - 2   # PAN
+      - 34  # PAN extended
+      - 35  # track 2
+      - 36  # track 3
+      - 45  # track 1
+
+keystore:
+  # Path to the keystore
+  path: keystore.bcfks
+  # Alias for the current secret key
+  currentKeyAlias: currentKey
+  # Alias for the previous secret key
+  previousKeyAlias: previousKey
+  # A cron-like expression that indicates when the secret key used to hash ISO8583 secret fields should be updated.
+  # It extends the usual UN*X definition to include triggers on the second, minute, hour, day of month, month, and day
+  # of week. For example, "0 * * * * MON-FRI" means once per minute on weekdays
+  # (at the top of the minute - the 0th second).
+  # The following macros are also supported.
+  # "@yearly" (or "@annually") to run un once a year, i.e. "0 0 0 1 1 *"
+  # "@monthly" to run once a month, i.e. "0 0 0 1 * *"
+  # "@weekly" to run once a week, i.e. "0 0 0 * * 0"
+  # "@daily" (or "@midnight") to run once a day, i.e. "0 0 0 * * *"
+  # "@hourly" to run once an hour, i.e. "0 0 * * * *
+  update-cron: '@yearly'
+
+antifraud:
+  # Base URL to send requests to the antifraud on every received ISO message
+  base-url: http://localhost:8383/antifraud
+
+# The root element for all properties related to logging.
+# See https://docs.spring.io/spring-boot/reference/features/logging.html
+logging:
+  level:
+    root: info
+#   file:
+#     name:
+#     path:
+#   logback:
+#     rollingpolicy:
+#       file-name-pattern
+#       max-file-size
+#       max-history
+
+
+
