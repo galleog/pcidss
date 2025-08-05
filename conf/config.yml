@@ -49,7 +49,7 @@ iso8583:
     # Default value for the ISO field 39 'Response Code'
     defaultResponseCode: '00'
     # Additional resources to build the message spec. They are applied consecutively
-    configs: []
+    specs: []
     # List of ISO8583 sensitive field numbers to be masked and encoded
     sensitiveDataFields:
       - 2   # PAN

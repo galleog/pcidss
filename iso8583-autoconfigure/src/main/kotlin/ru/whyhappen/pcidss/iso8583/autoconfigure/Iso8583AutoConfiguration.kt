@@ -47,9 +47,9 @@ class Iso8583AutoConfiguration {
             .reduce(IsoMessageSpec.spec) { a, b -> a + b }
 
         // add specs defined in JSON resources
-        return properties.message.configs
-            .fold(spec) { s, config ->
-                s + JsonResourceMessageSpecBuilder(objectMapper, config).build()
+        return properties.message.specs
+            .fold(spec) { s, resource ->
+                s + JsonResourceMessageSpecBuilder(objectMapper, resource).build()
             }
     }
 }

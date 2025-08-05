@@ -111,7 +111,7 @@ data class Iso8583MessageProperties(
     /**
      * Additional resources to build the message spec. They are applied consecutively.
      */
-    var configs: List<Resource> = emptyList(),
+    var specs: List<Resource> = emptyList(),
     /**
      * List of ISO8583 sensitive field numbers to be masked and encoded.
      */
@@ -120,6 +120,6 @@ data class Iso8583MessageProperties(
         34, // PAN extended
         35, // track 2
         36, // track 3
-        45, // track 1
+        45  // track 1
     )
 )

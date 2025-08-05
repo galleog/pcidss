@@ -64,7 +64,7 @@ class Iso8583AutoConfigurationTest {
             .withConfiguration(AutoConfigurations.of(Iso8583AutoConfiguration::class.java))
             .withUserConfiguration(Config::class.java)
             .withPropertyValues(
-                "iso8583.message.configs=classpath:test-spec.json",
+                "iso8583.message.specs=classpath:test-spec.json",
                 "iso8583.message.isoVersion=V1993"
             )
 
